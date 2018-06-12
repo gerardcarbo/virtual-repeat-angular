@@ -1,27 +1,44 @@
-# VirtualRepeatAngularLibApp
+# VirtualRepeatAngular
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.7.
+Synchronous / Asynchronous Virtual Repeat implementation.
 
-## Development server
+# Usage
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Synchronous:
 
-## Code scaffolding
+``` html
+    <gc-virtual-repeat-container rowHeight="auto">
+        <list-item-example *virtualRepeat="let row of collection; let i = index" [item]="row" [index]="i">
+        </list-item-example>
+    </gc-virtual-repeat-container>
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Where 'collection' is an Array.
 
-## Build
+Asynchronous:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+``` html
+    <gc-virtual-repeat-container rowHeight="auto">
+        <list-item-example *virtualRepeatAsynch="let row of asynchCollection; let i = index" [item]="row" [index]="i">
+        </list-item-example>
+    </gc-virtual-repeat-container>
+```
 
-## Running unit tests
+Where asynchCollection implements:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+``` typescript
+interface IAsynchCollection {
+    getLength(): Observable<number>;
+    getItem(i: number): Observable<any>;
+}
+```
 
-## Running end-to-end tests
+With auto-height (rowHeight="auto") the height of all rows is computed as the height of the first rendered row.
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+## Demo
 
-## Further help
+See <a href="https://gerardcarbo.github.io/virtual-repeat-angular/" target="_blank">https://gerardcarbo.github.io/virtual-repeat-angular/</a> 
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## License
+
+MIT

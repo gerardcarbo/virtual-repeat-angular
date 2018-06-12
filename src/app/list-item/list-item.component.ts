@@ -1,5 +1,6 @@
 import {Component, Input, OnDestroy} from '@angular/core';
-import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular-lib';
+//import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular-lib';
+import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular-lib/virtual-repeat-container';
 import {Subscription} from 'rxjs';
 @Component({
     selector: 'list-item-example',
@@ -8,7 +9,7 @@ import {Subscription} from 'rxjs';
         .list-item-example {
             width: 100%;
             height: 140px;
-            padding: 10px;
+            padding: 1px;
         }
         .list-item-wrapper {
             background-color: #fff;
@@ -52,8 +53,8 @@ export class ListItemExample implements OnDestroy {
 
     private _subscription = new Subscription();
 
-    constructor(private _infiniteList: VirtualRepeatContainer) {
-        this._subscription.add(this._infiniteList.scrollStateChange.subscribe((state: SCROLL_STATE) => {
+    constructor(private _virtualRepeatContainer: VirtualRepeatContainer) {
+        this._subscription.add(this._virtualRepeatContainer.scrollStateChange.subscribe((state: SCROLL_STATE) => {
             console.log('state changed: ', state);
         }));
     }

@@ -1,13 +1,33 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-</div>
-<h2>Example </h2>
-<div style="width:100%;height:300px">
-  <gc-virtual-repeat-container>
-    <list-item-example *virtualRepeat="let row of collection; let i = index" [item]="row" [index]="i">
-    </list-item-example>
-  </gc-virtual-repeat-container>
+<div class="vbox expand">
+  <div style="text-align:center">
+    <h1>
+      Virtual Repeat Angular {{title}}
+    </h1>
+  </div>
+  <div class="hbox flex margin">
+    <div class="vbox flex">
+      <h2>Colletion ({{collection.length}} #)</h2>
+      <div class="display_flex flex">
+        <div class="expand">
+          <!-- display: block parent with full size needed-->
+          <gc-virtual-repeat-container rowHeight="auto">
+            <list-item-example *virtualRepeat="let row of collection; let i = index" [item]="row" [index]="i">
+            </list-item-example>
+          </gc-virtual-repeat-container>
+        </div>
+      </div>
+    </div>
+    <div class="vbox flex ">
+      <h2>Asynch Colletion ({{asynchCollection.getLength() | async}} #)</h2>
+      <div class="display_flex flex ">
+        <div class="expand">
+          <!-- display: block parent with full size needed-->
+          <gc-virtual-repeat-container rowHeight="auto">
+            <list-item-example *virtualRepeatAsynch="let row of asynchCollection; let i = index" [item]="row" [index]="i">
+            </list-item-example>
+          </gc-virtual-repeat-container>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

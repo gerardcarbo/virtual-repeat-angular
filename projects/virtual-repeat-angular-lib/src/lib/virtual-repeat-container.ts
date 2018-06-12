@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common"
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, Output, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, Output, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { Subscription, BehaviorSubject, Observable, fromEvent } from 'rxjs';
 import { skip, filter, tap, delay, take, concat, map, debounceTime } from 'rxjs/operators';
 
@@ -8,7 +8,7 @@ export const SCROLL_STOP_TIME_THRESHOLD = 200; // in milliseconds
 const INVALID_POSITION = -1;
 
 @Component({
-    selector: 'gc-virtual-repeat-container', 
+    selector: 'gc-virtual-repeat-container',
     templateUrl: './virtual-repeat-container.html',
     styleUrls: ['./virtual-repeat-container.scss']
 })
@@ -84,7 +84,22 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
         return this._sizeChange.asObservable();
     }
 
-    @Input() rowHeight: number = 100;
+    @Input() set rowHeight(rowHeight: string) {
+        if(rowHeight != undefined) {
+            if (rowHeight != "auto") {
+                this._rowHeight = Number(rowHeight);
+                this._heightAutoComputed = this._autoHeight =  false;
+
+            } else {
+                this._heightAutoComputed = false;
+                this._autoHeight = true;
+            }            
+        }
+    } 
+
+    _rowHeight: number = 100;
+    _autoHeight: boolean = false;
+    _heightAutoComputed: boolean = false;
 
     @Input()
     set newScrollPosition(p: number) {
@@ -136,15 +151,6 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
                 .subscribe((scrollY: number) => {
                     this._scrollPosition.next(scrollY);
                 }));
-
-        this._subscription.add(
-            this.scrollPosition
-                .pipe(
-                    skip(1)
-                )
-                .subscribe((scrollY) => {
-                })
-        );
 
         this._subscription.add(
             this.scrollPosition

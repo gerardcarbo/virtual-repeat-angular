@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { TestBed, inject } from '@angular/core/testing';
 
 import { IterableDiffers, TemplateRef, ViewContainerRef } from '@angular/core';
-import { VirtualRepeat } from './virtual-repeat';
+import { VirtualRepeatAsynch } from './virtual-repeat-asynch';
 import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib/virtual-repeat-container';
 import { VirtualRepeatRow } from 'virtual-repeat-angular-lib/virtual-repeat.base';
 
@@ -35,7 +35,7 @@ describe('VirtualRepeat', () => {
     }));
   
   it('should create', inject([ IterableDiffers, VirtualRepeatContainer, TemplateRef, ViewContainerRef ], (iterableDiffers: IterableDiffers) => {
-    const directive = new VirtualRepeat(virtualRepeatContainer,
+    const directive = new VirtualRepeatAsynch(virtualRepeatContainer,
       iterableDiffers,
       template,
       viewContainerRef);

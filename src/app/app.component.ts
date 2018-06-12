@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { RemoteCollectionService } from './remote-collection.service';
 
 const MOCK_DATA = require('./MOCK_DATA.json');
 
@@ -8,17 +9,14 @@ const MOCK_DATA = require('./MOCK_DATA.json');
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit{
-  title = 'app';
+  title = 'Demo';
   collection: {id: number, image: string, content: string}[] = [];
 
-  newPosition = 0;
+  constructor(public asynchCollection: RemoteCollectionService){}
 
   ngOnInit(): void {
-
-    this.newPosition = 5000;
-
     setTimeout(() => {
         this.collection = MOCK_DATA;
-    }, 3000);
+    }, 0);
   }
 }

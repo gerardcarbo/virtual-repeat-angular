@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { VirtualRepeatContainer } from './virtual-repeat-container';
 import { VirtualRepeat } from './virtual-repeat';
+import { VirtualRepeatAsynch } from 'virtual-repeat-angular-lib/virtual-repeat-asynch';
 
 @NgModule({
   imports: [
@@ -9,11 +10,13 @@ import { VirtualRepeat } from './virtual-repeat';
   ],
   declarations: [
     VirtualRepeatContainer,
-    VirtualRepeat
+    VirtualRepeat,
+    VirtualRepeatAsynch
   ],
   exports: [
     VirtualRepeatContainer,
-    VirtualRepeat
+    VirtualRepeat,
+    VirtualRepeatAsynch
   ]
 })
 export class VirtualRepeatAngularLibModule { }
