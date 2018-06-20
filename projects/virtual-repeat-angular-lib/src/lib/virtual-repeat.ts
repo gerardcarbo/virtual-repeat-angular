@@ -19,8 +19,10 @@ import {
 } from '@angular/core';
 
 //import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib';
-import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib/virtual-repeat-container';
-import { VirtualRepeatRow, VirtualRepeatBase } from 'virtual-repeat-angular-lib/virtual-repeat.base';
+import { VirtualRepeatBase, VirtualRepeatRow } from './virtual-repeat.base';
+import { VirtualRepeatContainer } from './virtual-repeat-container';
+//import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib/virtual-repeat-container';
+//import { VirtualRepeatRow, VirtualRepeatBase } from 'virtual-repeat-angular-lib/virtual-repeat.base';
 
 @Directive({
     selector: '[virtualRepeat]'

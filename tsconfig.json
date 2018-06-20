@@ -18,12 +18,12 @@
     ],
     "paths": {
       "virtual-repeat-angular-lib": [
-        //"dist/virtual-repeat-angular-lib"
-        "projects/virtual-repeat-angular-lib/src/lib"
+        "dist/virtual-repeat-angular-lib"
+        //"projects/virtual-repeat-angular-lib/src/lib"
       ],
       "virtual-repeat-angular-lib/*": [
-        //"dist/virtual-repeat-angular-lib/*"
-        "projects/virtual-repeat-angular-lib/src/lib/*"
+        "dist/virtual-repeat-angular-lib/*"
+        //"projects/virtual-repeat-angular-lib/src/lib/*"
       ]
     }
   }

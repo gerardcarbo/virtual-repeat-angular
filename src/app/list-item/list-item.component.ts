@@ -1,6 +1,6 @@
 import {Component, Input, OnDestroy} from '@angular/core';
-//import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular-lib';
-import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular-lib/virtual-repeat-container';
+import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular-lib';
+//import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular-lib/virtual-repeat-container';
 import {Subscription} from 'rxjs';
 @Component({
     selector: 'list-item-example',
@@ -55,7 +55,7 @@ export class ListItemExample implements OnDestroy {
 
     constructor(private _virtualRepeatContainer: VirtualRepeatContainer) {
         this._subscription.add(this._virtualRepeatContainer.scrollStateChange.subscribe((state: SCROLL_STATE) => {
-            console.log('state changed: ', state);
+            //console.log('state changed: ', state);
         }));
     }
 

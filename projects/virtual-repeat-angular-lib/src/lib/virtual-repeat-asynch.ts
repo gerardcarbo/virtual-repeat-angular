@@ -19,8 +19,9 @@ import { Observable } from 'rxjs';
 import { map, first } from 'rxjs/operators';
 
 import { VirtualRepeatContainer } from './virtual-repeat-container';
+import { VirtualRepeatBase, VirtualRepeatRow } from './virtual-repeat.base';
 //import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib';
-import { VirtualRepeatRow, VirtualRepeatBase } from 'virtual-repeat-angular-lib/virtual-repeat.base';
+//import { VirtualRepeatRow, VirtualRepeatBase } from 'virtual-repeat-angular-lib/virtual-repeat.base';
 
 export interface IAsynchCollection {
     getLength(): Observable<number>;
@@ -33,6 +34,7 @@ export interface IAsynchCollection {
 export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnChanges, OnInit, OnDestroy {
 
     protected _collection: IAsynchCollection;
+    protected _length = -1;
 
     @Input() virtualRepeatAsynchOf: NgIterable<T>;
 
@@ -83,6 +85,7 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
 
         this._isInMeasure = true;
         this._collection.getLength().pipe(first()).subscribe((length) => {
+            this._length = length;
             this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * length;
             // calculate a approximate number of which a view can contain
             this.calculateScrapViewsLimit();
@@ -105,24 +108,23 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
             // detach all views without recycle them.
             return this.detachAllViews();
         }
-        this._collection.getLength().pipe(first()).subscribe((length) => {
-            if (length == 0) {
-                return this.detachAllViews();
-            }
-            this.findPositionInRange(length);
-            for (let i = 0; i < this._viewContainerRef.length; i++) {
-                let child = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(i);
-                // if (child.context.index < this._firstItemPosition || child.context.index > this._lastItemPosition || this._invalidate) {
-                this._viewContainerRef.detach(i);
-                this._recycler.recycleView(child.context.index, child);
-                i--;
-                // }
-            }
-            this.insertViews(length);
-            this._recycler.pruneScrapViews();
-            this._isInLayout = false;
-            this._invalidate = false;
-        });
+
+        if (this._length == 0) {
+            return this.detachAllViews();
+        }
+        this.findPositionInRange(this._length);
+        for (let i = 0; i < this._viewContainerRef.length; i++) {
+            let child = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(i);
+            // if (child.context.index < this._firstItemPosition || child.context.index > this._lastItemPosition || this._invalidate) {
+            this._viewContainerRef.detach(i);
+            this._recycler.recycleView(child.context.index, child);
+            i--;
+            // }
+        }
+        this.insertViews(this._length);
+        this._recycler.pruneScrapViews();
+        this._isInLayout = false;
+        this._invalidate = false;
     }
 
     protected insertViews(collection_length: number) {

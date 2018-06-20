@@ -14,7 +14,8 @@ import {
 
 import { Subscription, Observable } from 'rxjs';
 import { filter, map, debounceTime, first } from 'rxjs/operators';
-import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib/virtual-repeat-container';
+import { VirtualRepeatContainer } from './virtual-repeat-container';
+//import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib/virtual-repeat-container';
 
 export class Recycler {
     private limit: number = 0;
@@ -118,7 +119,7 @@ export abstract class VirtualRepeatBase<T> {
 
     protected _isInMeasure: boolean = false;
 
-    protected _pendingMeasurement: number;
+    protected _pendingMeasurement: any;
 
     protected _recycler: Recycler = new Recycler();
 
@@ -187,12 +188,15 @@ export abstract class VirtualRepeatBase<T> {
 
     protected requestMeasure() {
         if (this._isInMeasure || this._isInLayout) {
+            //console.trace("requestMeasure: clearTimeout");
             clearTimeout(this._pendingMeasurement);
-            this._pendingMeasurement = window.setTimeout(() => {
+            this._pendingMeasurement = setTimeout(() => {
+                //console.trace("requestMeasure: requestMeasure after timeout");
                 this.requestMeasure();
             }, 60);
             return;
         }
+        //console.trace("requestMeasure: call measure");
         this.measure();
     }
 
