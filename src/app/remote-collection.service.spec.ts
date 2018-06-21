@@ -1,15 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 
-import { RemoteCollectionService } from './remote-collection.service';
+import { AsynchCollectionService } from './asynch-collection.service';
 
 describe('RemoteCollectionService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [RemoteCollectionService]
+      providers: [AsynchCollectionService]
     });
   });
 
-  it('should be created', inject([RemoteCollectionService], (service: RemoteCollectionService) => {
+  it('should be created', inject([AsynchCollectionService], (service: AsynchCollectionService<any>) => {
     expect(service).toBeTruthy();
   }));
 });

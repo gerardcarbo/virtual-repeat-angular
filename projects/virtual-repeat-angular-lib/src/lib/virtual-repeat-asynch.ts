@@ -15,17 +15,12 @@ import {
     ViewRef
 } from '@angular/core';
 
-import { Observable } from 'rxjs';
-import { map, first } from 'rxjs/operators';
-
 import { VirtualRepeatContainer } from './virtual-repeat-container';
 import { VirtualRepeatBase, VirtualRepeatRow } from './virtual-repeat.base';
-//import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib';
-//import { VirtualRepeatRow, VirtualRepeatBase } from 'virtual-repeat-angular-lib/virtual-repeat.base';
 
-export interface IAsynchCollection {
-    getLength(): Observable<number>;
-    getItem(i: number): Observable<any>;
+export interface IAsynchCollection<T> {
+    getLength(): Promise<number>;
+    getItem(i: number): Promise<T>;
 }
 
 @Directive({
@@ -33,7 +28,7 @@ export interface IAsynchCollection {
 })
 export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnChanges, OnInit, OnDestroy {
 
-    protected _collection: IAsynchCollection;
+    protected _collection: IAsynchCollection<T>;
     protected _length = -1;
 
     @Input() virtualRepeatAsynchOf: NgIterable<T>;
@@ -74,9 +69,7 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
             const value = changes['virtualRepeatAsynchOf'].currentValue;
             this._collection = value;
 
-            this._virtualRepeatContainer._heightAutoComputed = false;
-
-            this.requestMeasure();
+            this.requestMeasure.next();
         }
     }
 
@@ -84,14 +77,13 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
         if (!this._collection) return;
 
         this._isInMeasure = true;
-        this._collection.getLength().pipe(first()).subscribe((length) => {
+        this._collection.getLength().then((length) => {
             this._length = length;
             this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * length;
             // calculate a approximate number of which a view can contain
             this.calculateScrapViewsLimit();
             this._isInMeasure = false;
-            this._invalidate = true;
-            this.requestLayout();
+            this.requestLayout.next();
         });
     }
 
@@ -115,16 +107,13 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
         this.findPositionInRange(this._length);
         for (let i = 0; i < this._viewContainerRef.length; i++) {
             let child = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(i);
-            // if (child.context.index < this._firstItemPosition || child.context.index > this._lastItemPosition || this._invalidate) {
             this._viewContainerRef.detach(i);
             this._recycler.recycleView(child.context.index, child);
             i--;
-            // }
         }
         this.insertViews(this._length);
         this._recycler.pruneScrapViews();
         this._isInLayout = false;
-        this._invalidate = false;
     }
 
     protected insertViews(collection_length: number) {
@@ -132,30 +121,27 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
             let firstChild = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(0);
             let lastChild = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(this._viewContainerRef.length - 1);
             for (let i = firstChild.context.index - 1; i >= this._firstItemPosition; i--) {
-                this.getView(collection_length, i).subscribe((view) => {
+                this.getView(collection_length, i).then((view) => {
                     this.dispatchLayout(i, view, true);
                 });
             }
             for (let i = lastChild.context.index + 1; i <= this._lastItemPosition; i++) {
-                let view = this.getView(collection_length, i).subscribe((view) => {
+                let view = this.getView(collection_length, i).then((view) => {
                     this.dispatchLayout(i, view, false);
                 });
             }
         } else {
             for (let i = this._firstItemPosition; i <= this._lastItemPosition; i++) {
-                this.getView(collection_length, i).subscribe((view) => {
+                this.getView(collection_length, i).then((view) => {
                     this.dispatchLayout(i, view, false);
                 });
             }
         }
     }
 
-    protected getView(collection_length: number, position: number): Observable<ViewRef> {
+    protected getView(collection_length: number, position: number): Promise<ViewRef> {
         let view = this._recycler.getView(position);
-        return this._collection.getItem(position)
-            .pipe(
-                first(),
-                map((item) => {
+        return this._collection.getItem(position).then((item) => {
                     if (!view) {
                         view = this._template.createEmbeddedView(new VirtualRepeatRow(item, position, collection_length));
                     } else {
@@ -164,8 +150,7 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
                         (view as EmbeddedViewRef<VirtualRepeatRow>).context.count = collection_length;
                     }
                     return view;
-                })
-            );
+                });
     }
 }
 

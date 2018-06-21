@@ -18,11 +18,8 @@ import {
     ViewRef
 } from '@angular/core';
 
-//import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib';
 import { VirtualRepeatBase, VirtualRepeatRow } from './virtual-repeat.base';
 import { VirtualRepeatContainer } from './virtual-repeat-container';
-//import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib/virtual-repeat-container';
-//import { VirtualRepeatRow, VirtualRepeatBase } from 'virtual-repeat-angular-lib/virtual-repeat.base';
 
 @Directive({
     selector: '[virtualRepeat]'
@@ -115,32 +112,27 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T> implements OnChanges,
         });
 
         if (isMeasurementRequired) {
-            this.requestMeasure();
+            this.requestMeasure.next();
         }
 
-        this.requestLayout();
-    }
-
-    ngOnDestroy(): void {
-        this._subscription.unsubscribe();
-        this._recycler.clean();
+        this.requestLayout.next();
     }
 
     protected measure() {
+        console.log("measure: enter");
         let collectionNumber = !this._collection || this._collection.length === 0 ? 0 : this._collection.length;
         this._isInMeasure = true;
         this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * collectionNumber;
         // calculate a approximate number of which a view can contain
         this.calculateScrapViewsLimit();
         this._isInMeasure = false;
-        this._invalidate = true;
-        this.requestLayout();
+        this.requestLayout.next();
+        console.log("measure: exit");
+
     }
 
     protected layout() {
-        if (this._isInLayout) {
-            return;
-        }
+        console.log("layout: enter");
         this._isInLayout = true;
         let { width, height } = this._virtualRepeatContainer.measure();
         this._containerWidth = width;
@@ -153,7 +145,6 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T> implements OnChanges,
                 i--;
             }
             this._isInLayout = false;
-            this._invalidate = false;
             return;
         }
         this.findPositionInRange(this._collection.length);
@@ -166,7 +157,7 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T> implements OnChanges,
         this.insertViews();
         this._recycler.pruneScrapViews();
         this._isInLayout = false;
-        this._invalidate = false;
+        console.log("layout: exit");
     }
 
     protected insertViews() {

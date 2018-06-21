@@ -12,10 +12,9 @@ import {
     ViewRef
 } from '@angular/core';
 
-import { Subscription, Observable } from 'rxjs';
-import { filter, map, debounceTime, first } from 'rxjs/operators';
+import { Subscription, Observable, Subject } from 'rxjs';
+import { filter, debounceTime, tap, throttleTime } from 'rxjs/operators';
 import { VirtualRepeatContainer } from './virtual-repeat-container';
-//import { VirtualRepeatContainer } from 'virtual-repeat-angular-lib/virtual-repeat-container';
 
 export class Recycler {
     private limit: number = 0;
@@ -108,13 +107,6 @@ export abstract class VirtualRepeatBase<T> {
     protected _containerWidth: number;
     protected _containerHeight: number;
 
-    /**
-     * when this value is true, a full clean layout is required, every element must be reposition
-     */
-    protected _invalidate: boolean = true;
-    /**
-     * when this value is true, a layout is in process
-     */
     protected _isInLayout: boolean = false;
 
     protected _isInMeasure: boolean = false;
@@ -123,35 +115,51 @@ export abstract class VirtualRepeatBase<T> {
 
     protected _recycler: Recycler = new Recycler();
 
-    @Input() virtualRepeatAsynchOf: NgIterable<T>;
-
-    @Input()
-    set virtualRepeatAsynchForTrackBy(fn: TrackByFunction<T>) {
-        if (isDevMode() && fn != null && typeof fn !== 'function') {
-            if (<any>console && <any>console.warn) {
-                console.warn(
-                    `trackBy must be a function, but received ${JSON.stringify(fn)}. ` +
-                    `See https://angular.io/docs/ts/latest/api/common/index/NgFor-directive.html#!#change-propagation for more information.`);
+    requestMeasure: Subject<any> = new Subject();
+    requestMeasureFiltered: Observable<any> = this.requestMeasure.pipe(
+        tap(() => {
+            console.log("requestMeasureFiltered: requested");
+        }),
+        throttleTime(60),
+        filter(() => {
+            console.log(`requestMeasureFiltered: enter isInMeasure: ${this._isInMeasure} isInLayout: ${this._isInLayout}`);
+            if (this._isInMeasure || this._isInLayout) {
+                console.log("requestMeasureFiltered: retrying...");
+                setTimeout(() => {
+                    this.requestMeasure.next();
+                }, 60);
             }
-        }
-        this._trackByFn = fn;
-    }
+            return !this._isInMeasure && !this._isInLayout;
+        })
+    );
 
-    get virtualRepeatAsynchForTrackBy(): TrackByFunction<T> {
-        return this._trackByFn;
-    }
-
-    @Input()
-    set virtualRepeatAsynchForTemplate(value: TemplateRef<VirtualRepeatRow>) {
-        if (value) {
-            this._template = value;
-        }
-    }
+    requestLayout: Subject<any> = new Subject();
+    requestLayoutFiltered: Observable<any> = this.requestLayout.pipe(
+        tap(() => {
+            console.log("requestLayoutFiltered: requested");
+        }),
+        filter(() => {
+            console.log(`requestLayoutFiltered: enter _isInMeasure: ${this._isInMeasure}  _isInLayout: ${this._isInLayout}`);
+            if (this._isInMeasure || this._isInLayout) {
+                console.log("requestLayoutFiltered: retrying...");
+                setTimeout(() => {
+                    this.requestLayout.next();
+                }, 60);
+            }
+            return !this._isInMeasure && !this._isInLayout;
+        })
+    );
 
     constructor(protected _virtualRepeatContainer: VirtualRepeatContainer,
         protected _differs: IterableDiffers,
         protected _template: TemplateRef<VirtualRepeatRow>,
         protected _viewContainerRef: ViewContainerRef) {
+        this._subscription.add(this.requestMeasureFiltered.subscribe(() => {
+            this.measure()
+        }));
+        this._subscription.add(this.requestLayoutFiltered.subscribe(() => {
+            this.layout()
+        }));
     }
 
     abstract ngOnChanges(changes: SimpleChanges);
@@ -166,17 +174,18 @@ export abstract class VirtualRepeatBase<T> {
             )
             .subscribe(
                 (scrollY) => {
+                    console.log('scrollPosition: ', scrollY);
                     this._scrollY = scrollY;
-                    this.requestLayout();
+                    this.requestLayout.next();
                 }
             ));
 
         this._subscription.add(this._virtualRepeatContainer.sizeChange.subscribe(
             ([width, height]) => {
-                // console.log('sizeChange: ', width, height);
+                console.log('sizeChange: ', width, height);
                 this._containerWidth = width;
                 this._containerHeight = height;
-                this.requestMeasure();
+                this.requestMeasure.next();
             }
         ));
     }
@@ -184,26 +193,6 @@ export abstract class VirtualRepeatBase<T> {
     ngOnDestroy(): void {
         this._subscription.unsubscribe();
         this._recycler.clean();
-    }
-
-    protected requestMeasure() {
-        if (this._isInMeasure || this._isInLayout) {
-            //console.trace("requestMeasure: clearTimeout");
-            clearTimeout(this._pendingMeasurement);
-            this._pendingMeasurement = setTimeout(() => {
-                //console.trace("requestMeasure: requestMeasure after timeout");
-                this.requestMeasure();
-            }, 60);
-            return;
-        }
-        //console.trace("requestMeasure: call measure");
-        this.measure();
-    }
-
-    protected requestLayout() {
-        if (!this._isInMeasure) {
-            this.layout();
-        }
     }
 
     protected abstract measure();
@@ -217,7 +206,6 @@ export abstract class VirtualRepeatBase<T> {
             i--;
         }
         this._isInLayout = false;
-        this._invalidate = false;
         return;
     }
 
@@ -234,6 +222,7 @@ export abstract class VirtualRepeatBase<T> {
         viewElement.style.width = `${this._containerWidth}px`;
         viewElement.style.height = `${this._virtualRepeatContainer._rowHeight}px`;
         viewElement.style.position = 'absolute';
+        viewElement.style.boxSizing = 'border-box';
     }
 
     protected dispatchLayout(position: number, view: ViewRef, addBefore: boolean) {
@@ -247,11 +236,15 @@ export abstract class VirtualRepeatBase<T> {
         view.reattach();
 
         //autoHeight update on first view attached
-        if(this._virtualRepeatContainer._autoHeight && !this._virtualRepeatContainer._heightAutoComputed)
-        {
-            this._virtualRepeatContainer._rowHeight = (<any>view).rootNodes[0].scrollHeight;
-            this._virtualRepeatContainer._heightAutoComputed = true;
-            this.requestMeasure();
+        if (this._virtualRepeatContainer._autoHeight) {
+            var height = (<any>view).rootNodes[0].scrollHeight;
+            console.log('dispatchLayout: autoHeight', height);
+            if (height != this._virtualRepeatContainer._rowHeight) {
+                this._virtualRepeatContainer._rowHeight = height;
+                console.log('dispatchLayout: rowHeight updated ' + height);
+                //this._virtualRepeatContainer._heightAutoComputed = true;
+                this.requestMeasure.next();
+            }
         }
     }
 

@@ -17,13 +17,13 @@
       "dom"
     ],
     "paths": {
-      "virtual-repeat-angular-lib": [
-        "dist/virtual-repeat-angular-lib"
-        //"projects/virtual-repeat-angular-lib/src/lib"
+      "virtual-repeat-angular": [
+        //"dist/virtual-repeat-angular-lib"
+        "projects/virtual-repeat-angular-lib/src/lib" //used to debug the library with .ts code
       ],
-      "virtual-repeat-angular-lib/*": [
-        "dist/virtual-repeat-angular-lib/*"
-        //"projects/virtual-repeat-angular-lib/src/lib/*"
+      "virtual-repeat-angular/*": [
+        //"dist/virtual-repeat-angular-lib/*"
+        "projects/virtual-repeat-angular-lib/src/lib/*"
       ]
     }
   }

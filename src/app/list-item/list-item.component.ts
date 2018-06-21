@@ -1,7 +1,9 @@
 import {Component, Input, OnDestroy} from '@angular/core';
-import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular-lib';
-//import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular-lib/virtual-repeat-container';
 import {Subscription} from 'rxjs';
+
+//import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular';
+import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular/virtual-repeat-container';
+
 @Component({
     selector: 'list-item-example',
     templateUrl: './list-item.html',
@@ -10,6 +12,7 @@ import {Subscription} from 'rxjs';
             width: 100%;
             height: 140px;
             padding: 1px;
+            box-sizing: border-box; 
         }
         .list-item-wrapper {
             background-color: #fff;

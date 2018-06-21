@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { TestBed, inject } from '@angular/core/testing';
 
+import { VirtualRepeatReactive } from './virtual-repeat-reactive';
 import { IterableDiffers, TemplateRef, ViewContainerRef } from '@angular/core';
-import { VirtualRepeatAsynch } from './virtual-repeat-asynch';
 import { VirtualRepeatContainer } from './virtual-repeat-container';
 import { VirtualRepeatRow } from './virtual-repeat.base';
 
@@ -17,13 +17,13 @@ describe('VirtualRepeat', () => {
       ]
     });
   });
-  
-  it('should create', inject([ IterableDiffers, VirtualRepeatContainer, TemplateRef, ViewContainerRef ], 
+
+  it('should create an instance', inject([IterableDiffers, VirtualRepeatContainer, TemplateRef, ViewContainerRef], 
     (iterableDiffers: IterableDiffers, 
       virtualRepeatContainer: VirtualRepeatContainer,
       template: TemplateRef<VirtualRepeatRow>,
       viewContainerRef: ViewContainerRef) => {
-    const directive = new VirtualRepeatAsynch(virtualRepeatContainer,
+    const directive = new VirtualRepeatReactive(virtualRepeatContainer,
       iterableDiffers,
       template,
       viewContainerRef);

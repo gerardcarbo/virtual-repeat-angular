@@ -6,13 +6,16 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class RemoteService {
-  constructor(private http: HttpClient) { }
+
+  constructor(private http: HttpClient) {
+  }
 
   getCount() {
     return 5000;
   }
 
   getPage(page: number) : Observable<any> {
-    return this.http.get('https://jsonplaceholder.typicode.com/photos?_page='+page);
+    console.log("RemoteService:getPage:",page)
+    return this.http.get('https://jsonplaceholder.typicode.com/photos?_page='+(page+1)); //starts at page 1
   }
 }

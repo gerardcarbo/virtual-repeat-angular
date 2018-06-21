@@ -1,7 +1,6 @@
-import { CommonModule } from "@angular/common"
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, OnDestroy, Output, Input, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, Output, Input } from '@angular/core';
 import { Subscription, BehaviorSubject, Observable, fromEvent } from 'rxjs';
-import { skip, filter, tap, delay, take, concat, map, debounceTime } from 'rxjs/operators';
+import { filter, tap, map, debounceTime } from 'rxjs/operators';
 
 export const SCROLL_STOP_TIME_THRESHOLD = 200; // in milliseconds
 
@@ -88,10 +87,9 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
         if(rowHeight != undefined) {
             if (rowHeight != "auto") {
                 this._rowHeight = Number(rowHeight);
-                this._heightAutoComputed = this._autoHeight =  false;
+                this._autoHeight =  false;
 
             } else {
-                this._heightAutoComputed = false;
                 this._autoHeight = true;
             }            
         }
@@ -99,8 +97,7 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
 
     _rowHeight: number = 100;
     _autoHeight: boolean = false;
-    _heightAutoComputed: boolean = false;
-
+ 
     @Input()
     set newScrollPosition(p: number) {
         // console.log('p', p);
