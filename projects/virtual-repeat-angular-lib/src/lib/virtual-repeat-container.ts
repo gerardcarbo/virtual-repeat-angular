@@ -15,6 +15,7 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
     private _holderHeight: number = 0;
     private _containerWidth: number = 0;
     private _containerHeight: number = 0;
+    public _translateY: number = 0;
 
     private _subscription: Subscription = new Subscription();
 
@@ -55,10 +56,14 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
     }
 
     get holderHeightInPx(): string {
-        if (this.holderHeight) {
-            return this.holderHeight + 'px';
+        if (this._holderHeight) {
+            return this._holderHeight + 'px';
         }
         return '100%';
+    }
+
+    get translateYInPx(): string {
+        return this._translateY + 'px';
     }
 
     /**
@@ -91,19 +96,24 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
 
             } else {
                 this._autoHeight = true;
-            }            
+                this._autoHeightComputed = false;
+         }            
         }
     } 
 
     _rowHeight: number = 100;
     _autoHeight: boolean = false;
+    _autoHeightComputed: boolean = false;
+    _autoHeightVariable: boolean = false;
+    _autoHeightVariableCount: number = 0;
+    _autoHeightRequestedMeasure: boolean = false;
  
     @Input()
     set newScrollPosition(p: number) {
-        // console.log('p', p);
+        // this.logger.log('p', p);
         this.listContainer.nativeElement.scrollTop = p;
         // if list-holder has no height at the certain time. scrollTop will not be set.
-        if (!this.holderHeight) {
+        if (!this._holderHeight) {
             this._initialScrollTop = p;
         }
         this._scrollPosition.next(p);
@@ -180,8 +190,6 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
 
     measure(): { width: number, height: number } {
         if (this.listContainer && this.listContainer.nativeElement) {
-            // let measuredWidth = this.listContainer.nativeElement.clientWidth;
-            // let measuredHeight = this.listContainer.nativeElement.clientHeight;
             let rect = this.listContainer.nativeElement.getBoundingClientRect();
             this._containerWidth = rect.width - this.scrollbarWidth;
             this._containerHeight = rect.height;

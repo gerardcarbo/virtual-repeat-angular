@@ -17,6 +17,7 @@ import {
 
 import { VirtualRepeatContainer } from './virtual-repeat-container';
 import { VirtualRepeatBase, VirtualRepeatRow } from './virtual-repeat.base';
+import { LoggerService } from './logger.service';
 
 export interface IAsynchCollection<T> {
     getLength(): Promise<number>;
@@ -29,7 +30,6 @@ export interface IAsynchCollection<T> {
 export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnChanges, OnInit, OnDestroy {
 
     protected _collection: IAsynchCollection<T>;
-    protected _length = -1;
 
     @Input() virtualRepeatAsynchOf: NgIterable<T>;
 
@@ -59,8 +59,10 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
     constructor(_virtualRepeatContainer: VirtualRepeatContainer,
         _differs: IterableDiffers,
         _template: TemplateRef<VirtualRepeatRow>,
-        _viewContainerRef: ViewContainerRef) {
-        super(_virtualRepeatContainer, _differs, _template, _viewContainerRef)
+        _viewContainerRef: ViewContainerRef,
+        logger: LoggerService
+    ) {
+        super(_virtualRepeatContainer, _differs, _template, _viewContainerRef, logger)
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -75,82 +77,30 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
 
     protected measure() {
         if (!this._collection) return;
-
         this._isInMeasure = true;
         this._collection.getLength().then((length) => {
-            this._length = length;
+            this._collectionLength = length;
             this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * length;
-            // calculate a approximate number of which a view can contain
-            this.calculateScrapViewsLimit();
             this._isInMeasure = false;
             this.requestLayout.next();
         });
     }
 
-    protected layout() {
-        if (this._isInLayout) {
-            return;
+    protected createView(index: number, addBefore: boolean): Promise<ViewRef> {
+        let view;
+        if (view = this._recycler.recoverView()) { //recover recycled views. Will be filled with new item once received.
+            let embedView = (<EmbeddedViewRef<VirtualRepeatRow>>view);
+            embedView.context.index = index;
+            embedView.rootNodes[0].style.height = this._virtualRepeatContainer._rowHeight + "px";
+            embedView.context.$implicit = this.emptyItem(embedView.context.$implicit);
+            view.reattach();
+            this._viewContainerRef.insert(view, (addBefore ? 0 : undefined));
         }
-        // console.log('on layout');
-        this._isInLayout = true;
-        let { width, height } = this._virtualRepeatContainer.measure();
-        this._containerWidth = width;
-        this._containerHeight = height;
-        if (!this._collection) {
-            // detach all views without recycle them.
-            return this.detachAllViews();
-        }
-
-        if (this._length == 0) {
-            return this.detachAllViews();
-        }
-        this.findPositionInRange(this._length);
-        for (let i = 0; i < this._viewContainerRef.length; i++) {
-            let child = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(i);
-            this._viewContainerRef.detach(i);
-            this._recycler.recycleView(child.context.index, child);
-            i--;
-        }
-        this.insertViews(this._length);
-        this._recycler.pruneScrapViews();
-        this._isInLayout = false;
-    }
-
-    protected insertViews(collection_length: number) {
-        if (this._viewContainerRef.length > 0) {
-            let firstChild = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(0);
-            let lastChild = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(this._viewContainerRef.length - 1);
-            for (let i = firstChild.context.index - 1; i >= this._firstItemPosition; i--) {
-                this.getView(collection_length, i).then((view) => {
-                    this.dispatchLayout(i, view, true);
-                });
-            }
-            for (let i = lastChild.context.index + 1; i <= this._lastItemPosition; i++) {
-                let view = this.getView(collection_length, i).then((view) => {
-                    this.dispatchLayout(i, view, false);
-                });
-            }
-        } else {
-            for (let i = this._firstItemPosition; i <= this._lastItemPosition; i++) {
-                this.getView(collection_length, i).then((view) => {
-                    this.dispatchLayout(i, view, false);
-                });
-            }
-        }
-    }
-
-    protected getView(collection_length: number, position: number): Promise<ViewRef> {
-        let view = this._recycler.getView(position);
-        return this._collection.getItem(position).then((item) => {
-                    if (!view) {
-                        view = this._template.createEmbeddedView(new VirtualRepeatRow(item, position, collection_length));
-                    } else {
-                        (view as EmbeddedViewRef<VirtualRepeatRow>).context.$implicit = item;
-                        (view as EmbeddedViewRef<VirtualRepeatRow>).context.index = position;
-                        (view as EmbeddedViewRef<VirtualRepeatRow>).context.count = collection_length;
-                    }
-                    return view;
-                });
+        
+        return this._collection.getItem(index).then((item) => {
+            this.createViewForItem(index, item);
+            return view;
+        });
     }
 }
 

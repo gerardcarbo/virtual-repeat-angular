@@ -5,6 +5,7 @@ import { VirtualRepeatReactive } from './virtual-repeat-reactive';
 import { IterableDiffers, TemplateRef, ViewContainerRef } from '@angular/core';
 import { VirtualRepeatContainer } from './virtual-repeat-container';
 import { VirtualRepeatRow } from './virtual-repeat.base';
+import { LoggerService } from './logger.service';
 
 describe('VirtualRepeat', () => {
   beforeEach(() => {
@@ -18,15 +19,17 @@ describe('VirtualRepeat', () => {
     });
   });
 
-  it('should create an instance', inject([IterableDiffers, VirtualRepeatContainer, TemplateRef, ViewContainerRef], 
+  it('should create an instance', inject([IterableDiffers, VirtualRepeatContainer, TemplateRef, ViewContainerRef, LoggerService], 
     (iterableDiffers: IterableDiffers, 
       virtualRepeatContainer: VirtualRepeatContainer,
       template: TemplateRef<VirtualRepeatRow>,
-      viewContainerRef: ViewContainerRef) => {
+      viewContainerRef: ViewContainerRef,
+      logger: LoggerService) => {
     const directive = new VirtualRepeatReactive(virtualRepeatContainer,
       iterableDiffers,
       template,
-      viewContainerRef);
+      viewContainerRef,
+      logger);
     expect(directive).toBeTruthy();
   }));
 });

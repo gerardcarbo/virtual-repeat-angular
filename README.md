@@ -49,15 +49,16 @@ Where **reactiveCollection** object must implement:
 interface IReactiveCollection<T> {
   length$: Observable<number>;
   items$: Observable<{ index: number, item: T }>
-  requestLength():void;
-  requestItem(index: number):void;
-  disconnect():void;
+  connect(): void;
+  disconnect(): void;
+  requestLength(): void;
+  requestItem(index: number): void;
 }
 ```
 
 ## Parameters
 
-* rowHeight *[number|'auto']*: item's row height in pixels. With auto-height (rowHeight="auto") the height of all rows is computed as the height of the first rendered row.
+* rowHeight *[number|'auto']*: item's row height in pixels. With auto-height (rowHeight="auto") the height of all rows is computed as the height of the first rendered row. 
 
 ## Demo
 
@@ -69,4 +70,4 @@ See <a href="https://gerardcarbo.github.io/virtual-repeat-angular/" target="_bla
 
 ## Acknowledgements
 
-Based on previous work of <a href="https://nya.io/uncategorized/make-a-list-view-in-angular/">Bob Yuan</a>
+Derived from previous work of <a href="https://nya.io/uncategorized/make-a-list-view-in-angular/">Bob Yuan</a> but using a offsetter div instead of absolute item positioning.

@@ -12,13 +12,19 @@ const MOCK_DATA = require('./MOCK_DATA.json');
 export class AppComponent implements OnInit{
 
   collection: {id: number, image: string, content: string}[] = [];
-  tableView = true;
+  config = {showCollection: true, showAsynch: true, showReactive: true};
 
-  constructor(public asynchCollection: AsynchCollectionService<any>, public reactiveCollection: ReactiveCollectionService<any>){}
+  constructor(public asynchCollection: AsynchCollectionService<any>, public reactiveCollection: ReactiveCollectionService<any>){
+    this.config = JSON.parse(localStorage.getItem('AppComponentConfig')) || this.config;
+  }
 
   ngOnInit(): void {
     setTimeout(() => {
         this.collection = MOCK_DATA;
-    }, 0);
+    }, 0); 
+  }
+
+  onChange() {
+    localStorage.setItem('AppComponentConfig', JSON.stringify(this.config));
   }
 }

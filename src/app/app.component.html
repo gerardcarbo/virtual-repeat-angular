@@ -5,48 +5,29 @@
         <svg style="fill: white;margin-right: 5px" viewBox="0 0 16 16" width="24" height="24" aria-hidden="true">
           <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
         </svg>
-        Virtual Repeat Angular Demo
+        Virtual Repeat Angular
       </a>
     </h1>
   </div>
   <div class="hbox flex margin">
-    <div class="vbox flex box">
-      <h2>Colletion (# {{collection.length}} local data)</h2>
-      <div class="display_flex flex box-shadow">
-        <div class="expand">
-          <!-- display: block parent with full size needed-->
-<!--           <gc-virtual-repeat-container rowHeight="auto">
-            <list-item-example *virtualRepeat="let row of collection; let i = index+1" [item]="row" [index]="i">
-            </list-item-example>
-          </gc-virtual-repeat-container> -->
-        </div>
-      </div>
-    </div>
-    <div class="vbox flex box">
-      <h2>Asynch Colletion (#<!--  {{asynchCollection.getLength() | async}}  -->remote data)</h2>
-      <div class="display_flex flex box-shadow">
-        <div class="expand">
-          <!-- display: block parent with full size needed-->
-<!--           <gc-virtual-repeat-container rowHeight="auto">
-            <list-item-example *virtualRepeatAsynch="let row of asynchCollection; let i = index" [item]="row" [index]="i">
-            </list-item-example>
-          </gc-virtual-repeat-container> -->
-        </div>
-      </div>
-    </div>
-    <div class="vbox flex box">
-      <h2>Reactive Colletion (# {{reactiveCollection.length$ | async}} remote data)
-        <label><input type="checkbox" name="tableView" [(ngModel)]="tableView">Table View</label>
+    <div class="vbox flex box" [ngStyle]="{'flex':config.showCollection ? 1 : 0 }">
+      <h2>
+        <label for="showCollection">
+          <input type="checkbox" id="showCollection" [(ngModel)]="config.showCollection" (change)="onChange()"> 
+          Colletion ({{collection.length}}# local)
+        </label>
+        <label style="float: right" *ngIf="config.showCollection">
+          <input type="checkbox" name="tableViewCollection" [(ngModel)]="config.tableViewCollection" (change)="onChange()">Table View</label>
       </h2>
-      <div class="display_flex flex box-shadow">
-        <div class="expand" *ngIf="!tableView">
+      <div class="display_flex flex box-shadow" *ngIf="config.showCollection">
+        <div class="expand" *ngIf="!config.tableViewCollection">
           <!-- display: block parent with full size needed-->
           <gc-virtual-repeat-container rowHeight="auto">
-            <list-item-example *virtualRepeatReactive="let row of reactiveCollection; let i = index" [item]="row" [index]="i">
+            <list-item-example *virtualRepeat="let row of collection; let i = index" [item]="row" [index]="i">
             </list-item-example>
           </gc-virtual-repeat-container>
         </div>
-        <div class="expand" *ngIf="tableView">
+        <div class="expand" *ngIf="config.tableViewCollection">
           <!-- display: block parent with full size needed-->
           <gc-virtual-repeat-container rowHeight="auto">
             <table>
@@ -55,17 +36,117 @@
                   <td style="width:10%">Img</td>
                   <td style="width:10%">Id</td>
                   <td style="width:60%">Title</td>
-                  <td style="width:10%">AlbumId</td>
-                  <td style="width:10%"></td>
+                  <td style="width:10%">OtherId</td>
+                  <td style="width:10%">Item</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *virtualRepeat="let row of collection; let i = index">
+                  <td style="width:10%">
+                    <img src='{{row.thumbnailUrl}}' height="48px">
+                  </td>
+                  <td style="width:10%">{{row.id}}</td>
+                  <td style="width:60%">{{row.title}}</td>
+                  <td style="width:10%">{{row.albumId}}</td>
+                  <td style="width:10%">
+                    <div style="background-color: #eaeaea;padding: 0.5rem;text-align: center">{{i}}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </gc-virtual-repeat-container>
+        </div>
+      </div>
+    </div>
+    <div class="vbox flex box" [ngStyle]="{'flex':config.showAsynch ? 1 : 0 }">
+      <h2>
+        <label for="showAsynch">
+          <input type="checkbox" id="showAsynch" [(ngModel)]="config.showAsynch" (change)="onChange()"> 
+          Asynch Colletion ({{asynchCollection.getLength() | async}}# remote)
+        </label>
+        <label style="float: right" *ngIf="config.showAsynch">
+          <input type="checkbox" name="tableViewAsynch" [(ngModel)]="config.tableViewAsynch" (change)="onChange()">Table View</label>
+      </h2>
+      <div class="display_flex flex box-shadow" *ngIf="config.showAsynch">
+        <div class="expand" *ngIf="!config.tableViewAsynch">
+          <!-- display: block parent with full size needed-->
+          <gc-virtual-repeat-container rowHeight="auto">
+            <list-item-example *virtualRepeatAsynch="let row of asynchCollection; let i = index" [item]="row" [index]="i">
+            </list-item-example>
+          </gc-virtual-repeat-container>
+        </div>
+        <div class="expand" *ngIf="config.tableViewAsynch">
+          <!-- display: block parent with full size needed-->
+          <gc-virtual-repeat-container rowHeight="auto">
+            <table>
+              <thead>
+                <tr>
+                  <td style="width:10%">Img</td>
+                  <td style="width:10%">Id</td>
+                  <td style="width:60%">Title</td>
+                  <td style="width:10%">OtherId</td>
+                  <td style="width:10%">Item</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *virtualRepeatAsynch="let row of asynchCollection; let i = index">
+                  <td style="width:10%">
+                    <img src='{{row.thumbnailUrl}}' height="48px">
+                  </td>
+                  <td style="width:10%">{{row.id}}</td>
+                  <td style="width:60%">{{row.title}}</td>
+                  <td style="width:10%">{{row.albumId}}</td>
+                  <td style="width:10%">
+                    <div style="background-color: #eaeaea;padding: 0.5rem;text-align: center">{{i}}</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </gc-virtual-repeat-container>
+        </div>
+      </div>
+    </div>
+    <div class="vbox flex box" [ngStyle]="{'flex':config.showReactive ? 1 : 0 }">
+      <h2>
+        <label for="showReactive">
+          <input type="checkbox" id="showReactive" [(ngModel)]="config.showReactive" (change)="onChange()"> 
+          Reactive Colletion ({{reactiveCollection.length$ | async}}# remote)
+        </label>
+        <label style="float: right" *ngIf="config.showReactive">
+          <input type="checkbox" name="tableView" [(ngModel)]="config.tableViewReactive" (change)="onChange()">Table View</label>
+      </h2>
+      <div class="display_flex flex box-shadow" *ngIf="config.showReactive">
+        <div class="expand" *ngIf="!config.tableViewReactive">
+          <!-- display: block parent with full size needed-->
+          <gc-virtual-repeat-container rowHeight="auto">
+            <list-item-example *virtualRepeatReactive="let row of reactiveCollection; let i = index" [item]="row" [index]="i">
+            </list-item-example>
+          </gc-virtual-repeat-container>
+        </div>
+        <div class="expand" *ngIf="config.tableViewReactive">
+          <!-- display: block parent with full size needed-->
+          <gc-virtual-repeat-container rowHeight="auto">
+            <table>
+              <thead>
+                <tr>
+                  <td style="width:10%">Img</td>
+                  <td style="width:10%">Id</td>
+                  <td style="width:60%">Title</td>
+                  <td style="width:10%">OtherId</td>
+                  <td style="width:10%">Item</td>
                 </tr>
               </thead>
               <tbody>
                 <tr *virtualRepeatReactive="let row of reactiveCollection; let i = index">
-                  <td style="width:10%"><img src='{{row.thumbnailUrl}}' height="48px"></td>
+                  <td style="width:10%">
+                    <img src='{{row.thumbnailUrl}}' height="48px">
+                  </td>
                   <td style="width:10%">{{row.id}}</td>
                   <td style="width:60%">{{row.title}}</td>
                   <td style="width:10%">{{row.albumId}}</td>
-                  <td style="width:10%"><div style="background-color: #eaeaea;padding: 0.5rem;text-align: center">{{i}}</div></td>
+                  <td style="width:10%">
+                    <div style="background-color: #eaeaea;padding: 0.5rem;text-align: center">{{i}}</div>
+                  </td>
                 </tr>
               </tbody>
             </table>

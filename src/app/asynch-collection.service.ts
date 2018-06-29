@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { RemoteService } from './remote.service';
 import { map } from 'rxjs/operators';
 
-import { IAsynchCollection } from 'virtual-repeat-angular/virtual-repeat-asynch';
-//import { IAsynchCollection } from 'virtual-repeat-angular';
+//import { IAsynchCollection } from 'virtual-repeat-angular/virtual-repeat-asynch';
+import { IAsynchCollection, LoggerService} from 'virtual-repeat-angular';
 
 @Injectable({
   providedIn: 'root'
@@ -11,24 +11,22 @@ import { IAsynchCollection } from 'virtual-repeat-angular/virtual-repeat-asynch'
 export class AsynchCollectionService<T> implements IAsynchCollection<T> {
 
   private _itemsPerPage = 10;
-  private _length = 0;
   private _collection = [];
   private _lenghtPromise: Promise<number>;
 
-  constructor(private remoteService: RemoteService) {
-    this._length = this.remoteService.getCount();
-    this._lenghtPromise = Promise.resolve(this._length);
+  constructor(private remoteService: RemoteService, private logger:LoggerService) {
+    this._lenghtPromise = Promise.resolve(this.remoteService.getCount());
   }
 
-  getLength() {
-    console.log("AsynchCollectionService: getLength")
+  getLength(): Promise<number> {
+    this.logger.log("AsynchCollectionService: getLength")
     return this._lenghtPromise;
   }
 
-  getItem(index: number) {
-    console.log("AsynchCollectionService: getItem ", index)
+  getItem(index: number): Promise<T> {
+    this.logger.log("AsynchCollectionService: getItem ", index)
     if (this._collection[index]) {
-      console.log("AsynchCollectionService: returns ", this._collection[index])
+      this.logger.log("AsynchCollectionService: returns ", this._collection[index])
       return Promise.resolve(this._collection[index]);
     }
 
@@ -46,7 +44,7 @@ export class AsynchCollectionService<T> implements IAsynchCollection<T> {
           }
 
           //return item
-          console.log("AsynchCollectionService: returns paged", this._collection[index])
+          this.logger.log("AsynchCollectionService: returns paged", this._collection[index])
           return this._collection[index];
         })
       ).toPromise();

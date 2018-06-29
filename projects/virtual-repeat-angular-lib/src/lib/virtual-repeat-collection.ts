@@ -20,6 +20,7 @@ import {
 
 import { VirtualRepeatBase, VirtualRepeatRow } from './virtual-repeat.base';
 import { VirtualRepeatContainer } from './virtual-repeat-container';
+import { LoggerService } from './logger.service';
 
 @Directive({
     selector: '[virtualRepeat]'
@@ -56,8 +57,9 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T> implements OnChanges,
     constructor(_virtualRepeatContainer: VirtualRepeatContainer,
         _differs: IterableDiffers,
         _template: TemplateRef<VirtualRepeatRow>,
-        _viewContainerRef: ViewContainerRef) {
-        super(_virtualRepeatContainer, _differs, _template, _viewContainerRef)
+        _viewContainerRef: ViewContainerRef,
+        logger: LoggerService) {
+        super(_virtualRepeatContainer, _differs, _template, _viewContainerRef, logger)
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -92,17 +94,17 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T> implements OnChanges,
         changes.forEachOperation((item: IterableChangeRecord<any>, adjustedPreviousIndex: number, currentIndex: number) => {
             if (item.previousIndex == null) {
                 // new item
-                // console.log('new item', item, adjustedPreviousIndex, currentIndex);
+                // this.logger.log('new item', item, adjustedPreviousIndex, currentIndex);
                 isMeasurementRequired = true;
                 this._collection.splice(currentIndex, 0, item.item);
             } else if (currentIndex == null) {
                 // remove item
-                // console.log('remove item', item, adjustedPreviousIndex, currentIndex);
+                // this.logger.log('remove item', item, adjustedPreviousIndex, currentIndex);
                 isMeasurementRequired = true;
                 this._collection.splice(adjustedPreviousIndex, 1);
             } else {
                 // move item
-                // console.log('move item', item, adjustedPreviousIndex, currentIndex);
+                // this.logger.log('move item', item, adjustedPreviousIndex, currentIndex);
                 this._collection.splice(currentIndex, 0, this._collection.splice(adjustedPreviousIndex, 1)[0]);
             }
         });
@@ -119,82 +121,20 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T> implements OnChanges,
     }
 
     protected measure() {
-        console.log("measure: enter");
-        let collectionNumber = !this._collection || this._collection.length === 0 ? 0 : this._collection.length;
+        this.logger.log("measure: enter");
+        this._collectionLength = !this._collection || this._collection.length === 0 ? 0 : this._collection.length;
         this._isInMeasure = true;
-        this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * collectionNumber;
-        // calculate a approximate number of which a view can contain
-        this.calculateScrapViewsLimit();
+        this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * this._collectionLength;
         this._isInMeasure = false;
         this.requestLayout.next();
-        console.log("measure: exit");
-
+        this.logger.log("measure: exit");
     }
 
-    protected layout() {
-        console.log("layout: enter");
-        this._isInLayout = true;
-        let { width, height } = this._virtualRepeatContainer.measure();
-        this._containerWidth = width;
-        this._containerHeight = height;
-        if (!this._collection || this._collection.length === 0) {
-            // detach all views without recycle them.
-            for (let i = 0; i < this._viewContainerRef.length; i++) {
-                let child = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(i);
-                this._viewContainerRef.detach(i);
-                i--;
-            }
-            this._isInLayout = false;
-            return;
-        }
-        this.findPositionInRange(this._collection.length);
-        for (let i = 0; i < this._viewContainerRef.length; i++) {
-            let child = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(i);
-            this._viewContainerRef.detach(i);
-            this._recycler.recycleView(child.context.index, child);
-            i--;
-        }
-        this.insertViews();
-        this._recycler.pruneScrapViews();
-        this._isInLayout = false;
-        console.log("layout: exit");
-    }
-
-    protected insertViews() {
-        if (this._viewContainerRef.length > 0) {
-            let firstChild = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(0);
-            let lastChild = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(this._viewContainerRef.length - 1);
-            for (let i = firstChild.context.index - 1; i >= this._firstItemPosition; i--) {
-                let view = this.getView(i);
-                this.dispatchLayout(i, view, true);
-            }
-            for (let i = lastChild.context.index + 1; i <= this._lastItemPosition; i++) {
-                let view = this.getView(i);
-                this.dispatchLayout(i, view, false);
-            }
-        } else {
-            for (let i = this._firstItemPosition; i <= this._lastItemPosition; i++) {
-                let view = this.getView(i);
-                this.dispatchLayout(i, view, false);
-            }
-        }
-    }
-
-    protected getView(position: number): ViewRef {
-        let view = this._recycler.getView(position);
-        let item = this._collection[position];
-        let count = this._collection.length;
-        if (!view) {
-            view = this._template.createEmbeddedView(new VirtualRepeatRow(item, position, count));
-        } else {
-            (view as EmbeddedViewRef<VirtualRepeatRow>).context.$implicit = item;
-            (view as EmbeddedViewRef<VirtualRepeatRow>).context.index = position;
-            (view as EmbeddedViewRef<VirtualRepeatRow>).context.count = count;
-        }
-        return view;
+    protected createView(index: number) {
+        let item = this._collection[index];
+        this.createViewForItem(index, item);
     }
 }
-
 
 export function getTypeNameForDebugging(type: any): string {
     return type['name'] || typeof type;

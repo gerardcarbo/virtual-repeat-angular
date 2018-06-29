@@ -18,14 +18,15 @@ import { Observable, Subscription } from 'rxjs';
 
 import { VirtualRepeatContainer } from './virtual-repeat-container';
 import { VirtualRepeatBase, VirtualRepeatRow } from './virtual-repeat.base';
+import { LoggerService } from './logger.service';
 
 export interface IReactiveCollection<T> {
   length$: Observable<number>;
   items$: Observable<{ index: number, item: T }>
-  connect():void;
-  disconnect():void;  
-  requestLength():void;
-  requestItem(index: number):void;
+  connect(): void;
+  disconnect(): void;
+  requestLength(): void;
+  requestItem(index: number): void;
 }
 
 @Directive({
@@ -34,8 +35,7 @@ export interface IReactiveCollection<T> {
 export class VirtualRepeatReactive<T> extends VirtualRepeatBase<T> implements OnChanges, OnInit, OnDestroy {
 
   protected _collection: IReactiveCollection<T>;
-  protected _length = -1;
-  
+
   @Input() virtualRepeatReactiveOf: NgIterable<T>;
 
   @Input()
@@ -61,11 +61,12 @@ export class VirtualRepeatReactive<T> extends VirtualRepeatBase<T> implements On
     }
   }
 
-  constructor(_virtualRepeatContainer: VirtualRepeatContainer,
-    _differs: IterableDiffers,
-    _template: TemplateRef<VirtualRepeatRow>,
-    _viewContainerRef: ViewContainerRef) {
-    super(_virtualRepeatContainer, _differs, _template, _viewContainerRef)
+  constructor(virtualRepeatContainer: VirtualRepeatContainer,
+    differs: IterableDiffers,
+    template: TemplateRef<VirtualRepeatRow>,
+    viewContainerRef: ViewContainerRef,
+    logger: LoggerService) {
+    super(virtualRepeatContainer, differs, template, viewContainerRef, logger)
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -73,109 +74,71 @@ export class VirtualRepeatReactive<T> extends VirtualRepeatBase<T> implements On
       // React on virtualRepeatReactiveOf only once all inputs have been initialized
       const value = changes['virtualRepeatReactiveOf'].currentValue;
       this._collection = value;
-      console.log("ngOnChanges: this._collection asigned.");
+      this._collection.connect();
+      this.logger.log("ngOnChanges: this._collection asigned.");
 
       this._subscription.add(this._collection.length$.subscribe((lenght) => this.onLength(lenght)));
-      this._subscription.add(this._collection.items$.subscribe((data) => this.onItem(data)));
+      this._subscription.add(this._collection.items$.subscribe((data) => {
+        try{
+          this.onItem(data);
+        }catch(exc){
+          this.logger.log("onItem: Exception", exc);
+        }
+      }));
+
+      this.requestMeasure.next();
     }
   }
 
-  ngOnInit() {
-    super.ngOnInit();
-    this._collection.connect();
-    this.requestMeasure.next();
+  protected connect() {
+    super.connect();
   }
 
-  ngOnDestroy(){
-    super.ngOnDestroy();
+  protected disconnect() {
+    super.disconnect();
     this._collection.disconnect();
   }
 
   protected measure() {
-    console.log("measure: enter");
-    if (!this._collection){
-      console.log("measure: !this._collection. Exit");
+    this.logger.log("measure: enter");
+    if (!this._collection) {
+      this.logger.log("measure: !this._collection. Exit");
       return;
-    } 
+    }
 
-    console.log("measure: requestLength -> onLength");
+    this.logger.log("measure: requestLength -> onLength");
     this._collection.requestLength();
   }
 
   onLength(length) {
-    console.log("onLength: enter", this._length, length);
-    this._isInMeasure = true;      
-    this._length = length;
+    this.logger.log("onLength: enter", this._collectionLength, length);
+    this._isInMeasure = true;
+    this._collectionLength = length;
     this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * length;
     // calculate a approximate number of which a view can contain
-    this.calculateScrapViewsLimit();
-    this._isInMeasure = false;     
-    console.log("onLength: requestLayout");
-    this.requestLayout.next(); 
+    this._isInMeasure = false;
+    this.logger.log("onLength: requestLayout");
+    this.requestLayout.next();
   }
 
-  protected layout() {
-    console.log('layout: on layout');
-    this._isInLayout = true;
-    let { width, height } = this._virtualRepeatContainer.measure();
-    this._containerWidth = width;
-    this._containerHeight = height;
-    if (!this._collection) {
-      // detach all views without recycle them.
-      console.log('layout: !this._collection. detachAllViews');
-      this._isInLayout = false;
-      return this.detachAllViews();
+  protected createView(index: number, addBefore: boolean) {
+    this.logger.log("createView: requestItem: ", index);
+    let view;
+    if(view = this._recycler.recoverView()) { //recover recycled views. Will be filled with new item once received.
+      let embedView = (<EmbeddedViewRef<VirtualRepeatRow>>view);
+      embedView.context.index = index;
+      embedView.rootNodes[0].style.height = this._virtualRepeatContainer._rowHeight + "px";
+      embedView.context.$implicit = this.emptyItem(embedView.context.$implicit);
+      view.reattach();
+      this._viewContainerRef.insert(view, (addBefore ? 0 : undefined));
     }
 
-    if (this._length == 0) {
-      console.log('layout: this._isInLayout = false. detachAllViews');
-      this._isInLayout = false;
-      return this.detachAllViews();
-    }
-    this.findPositionInRange(this._length);
-    for (let i = 0; i < this._viewContainerRef.length; i++) {
-      let child = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(i);
-      this._viewContainerRef.detach(i);
-      this._recycler.recycleView(child.context.index, child);
-      i--;
-    }
-    this.insertViews(this._length);
-    this._recycler.pruneScrapViews();
-    this._isInLayout = false;
-  }
-
-  protected insertViews(collection_length: number) {
-    if (this._viewContainerRef.length > 0) {
-      let firstChild = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(0);
-      let lastChild = <EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(this._viewContainerRef.length - 1);
-      for (let i = firstChild.context.index - 1; i >= this._firstItemPosition; i--) {
-        this.getView(collection_length, i);
-      }
-      for (let i = lastChild.context.index + 1; i <= this._lastItemPosition; i++) {
-        let view = this.getView(collection_length, i);
-      }
-    } else {
-      for (let i = this._firstItemPosition; i <= this._lastItemPosition; i++) {
-        this.getView(collection_length, i);
-      }
-    }
-  }
-
-  protected getView(collection_length: number, position: number) {
-    this._collection.requestItem(position);
+    this._collection.requestItem(index);
   }
 
   onItem(data: { index: number, item: T }) {
+    this.logger.log("onItem: enter", data);
     const { index, item } = data;
-    let view = this._recycler.getView(index);
-    if (!view) {
-      view = this._template.createEmbeddedView(new VirtualRepeatRow(item, index, this._length));
-    } else {
-      (view as EmbeddedViewRef<VirtualRepeatRow>).context.$implicit = item;
-      (view as EmbeddedViewRef<VirtualRepeatRow>).context.index = index;
-      (view as EmbeddedViewRef<VirtualRepeatRow>).context.count = this._length;
-    }
-    return this.dispatchLayout(index, view, false);
+    this.createViewForItem(index, item);
   }
-
 }

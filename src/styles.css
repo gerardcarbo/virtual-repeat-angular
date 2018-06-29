@@ -42,7 +42,7 @@ h2 {
 
 table {
   width: 100%;
-  border-spacing: 1px;
+  border-spacing: 0px; /*IMPORTANT*/
 }
 
 .expand {
@@ -100,3 +100,7 @@ h1, h2 {
   border: 1px solid #ddd;
   border-radius: 3px;
 }
+
+.demo {
+}
+

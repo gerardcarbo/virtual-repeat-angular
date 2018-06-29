@@ -1,5 +1,10 @@
 <div class="gc-virtual-repeat-container" #listContainer [ngClass]="scrollbarStyle">
-    <div class="gc-virtual-repeat-container" [style.height]="holderHeightInPx">
+    <div class="gc-virtual-repeat-container-holder" [style.height]="holderHeightInPx">
+        <div class="gc-virtual-repeat-offsetter" role="presentation" [style.transform]="'translateY('+ translateYInPx +')'">
+            <ng-content></ng-content>
+        </div>
+    </div>
+    <div class="gc-virtual-repeat-offsetter" role="presentation" [style.transform]="'translateY('+ translateYInPx +')'">
         <ng-content></ng-content>
     </div>
 </div>
