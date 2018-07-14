@@ -348,23 +348,22 @@ export abstract class VirtualRepeatBase<T> {
                 this._virtualRepeatContainer._autoHeightVariable = true;
             }
 
-            /*if(this._virtualRepeatContainer._autoHeightVariable){
+            if(this._virtualRepeatContainer._autoHeightVariable){
                 this._virtualRepeatContainer._autoHeightVariableCount++;
                 this.logger.log('dispatchLayout: _autoHeightVariable rowHeight ' + height);
 
                 this._virtualRepeatContainer._rowHeight += (height - this._virtualRepeatContainer._rowHeight) / this._virtualRepeatContainer._autoHeightVariableCount;
                 this.logger.log('dispatchLayout: _autoHeightVariable mean height('+this._virtualRepeatContainer._autoHeightVariableCount+'):' + this._virtualRepeatContainer._rowHeight);
 
-                if(this._virtualRepeatContainer._autoHeightVariableCount % this._lastItemPosition - this._firstItemPosition == 0){
+                if(this._virtualRepeatContainer._autoHeightVariableCount % this._lastRequestedItemIndex - this._firstRequestedItemIndex == 0){
                     this.logger.log('dispatchLayout: _autoHeightVariable update holderHeight');
                     this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * this._collectionLength;           
                 }
-            }*/
+            }
         }
     }
 
     protected applyStyles(viewElement: HTMLElement) {
-        viewElement.style.width = `${this._containerWidth}px`;
         if (!this._virtualRepeatContainer._autoHeight) {
             viewElement.style.height = `${this._virtualRepeatContainer._rowHeight}px`;
         } else {
@@ -405,7 +404,8 @@ export abstract class VirtualRepeatBase<T> {
                     this.logger.log(`createViewForItem: checking ${viewIndex} ++`);
                     if (index == viewIndex) {
                         this.logger.log(`createViewForItem: reasign ${viewIndex} ++`);
-                        (<EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(containerIndex)).context.$implicit = item;
+                        view = this._viewContainerRef.get(containerIndex);
+                        (<EmbeddedViewRef<VirtualRepeatRow>>view).context.$implicit = item;
                         inserted = true;
                         break;
                     } else if (index > viewIndex) {
@@ -427,7 +427,8 @@ export abstract class VirtualRepeatBase<T> {
                     this.logger.log(`createViewForItem: checking ${viewIndex} --`);
                     if (index == viewIndex) {
                         this.logger.log(`createViewForItem: reasign ${viewIndex} --`);
-                        (<EmbeddedViewRef<VirtualRepeatRow>>this._viewContainerRef.get(containerIndex)).context.$implicit = item;
+                        view = this._viewContainerRef.get(containerIndex);
+                        (<EmbeddedViewRef<VirtualRepeatRow>>view).context.$implicit = item;
                         inserted = true;
                         break;
                     } else if (index < viewIndex) {

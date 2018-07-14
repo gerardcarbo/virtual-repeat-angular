@@ -1,8 +1,7 @@
-import {Component, Input, OnDestroy} from '@angular/core';
-import {Subscription} from 'rxjs';
-
-//import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular/virtual-repeat-container';
-import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular';
+import { Component, Input, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular/virtual-repeat-container';
+//import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular';
 
 @Component({
     selector: 'list-item-example',

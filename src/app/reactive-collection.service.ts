@@ -3,8 +3,9 @@ import { RemoteService } from './remote.service';
 import { Subject, of, BehaviorSubject, Subscription, Observable, ReplaySubject } from 'rxjs';
 import { flatMap, map, distinct, filter, throttleTime, distinctUntilChanged, catchError } from 'rxjs/operators';
 
-//import { IReactiveCollection } from 'virtual-repeat-angular/virtual-repeat-reactive';
-import { IReactiveCollection, LoggerService } from 'virtual-repeat-angular';
+import { IReactiveCollection } from 'virtual-repeat-angular/virtual-repeat-reactive';
+import { LoggerService } from 'virtual-repeat-angular/logger.service';
+//import { IReactiveCollection, LoggerService } from 'virtual-repeat-angular';
 
 @Injectable({
   providedIn: 'root'

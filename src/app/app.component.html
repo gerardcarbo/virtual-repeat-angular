@@ -14,7 +14,8 @@
       <h2>
         <label for="showCollection">
           <input type="checkbox" id="showCollection" [(ngModel)]="config.showCollection" (change)="onChange()"> 
-          Colletion ({{collection.length}}# local)
+          Colletion 
+          <label *ngIf="config.showCollection">({{collection.length}}# local)</label>
         </label>
         <label style="float: right" *ngIf="config.showCollection">
           <input type="checkbox" name="tableViewCollection" [(ngModel)]="config.tableViewCollection" (change)="onChange()">Table View</label>
@@ -62,7 +63,8 @@
       <h2>
         <label for="showAsynch">
           <input type="checkbox" id="showAsynch" [(ngModel)]="config.showAsynch" (change)="onChange()"> 
-          Asynch Colletion ({{asynchCollection.getLength() | async}}# remote)
+          Asynch Colletion 
+          <label *ngIf="config.showAsynch">({{asynchCollection.getLength() | async}}# remote)</label>
         </label>
         <label style="float: right" *ngIf="config.showAsynch">
           <input type="checkbox" name="tableViewAsynch" [(ngModel)]="config.tableViewAsynch" (change)="onChange()">Table View</label>
@@ -110,7 +112,8 @@
       <h2>
         <label for="showReactive">
           <input type="checkbox" id="showReactive" [(ngModel)]="config.showReactive" (change)="onChange()"> 
-          Reactive Colletion ({{reactiveCollection.length$ | async}}# remote)
+          Reactive Colletion 
+          <label *ngIf="config.showReactive">({{reactiveCollection.length$ | async}}# remote)</label>
         </label>
         <label style="float: right" *ngIf="config.showReactive">
           <input type="checkbox" name="tableView" [(ngModel)]="config.tableViewReactive" (change)="onChange()">Table View</label>

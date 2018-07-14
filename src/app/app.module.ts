@@ -6,8 +6,8 @@ import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 
-//import { VirtualRepeatAngularLibModule } from 'virtual-repeat-angular/virtual-repeat-angular-lib.module';
-import { VirtualRepeatAngularLibModule } from 'virtual-repeat-angular';
+import { VirtualRepeatAngularLibModule } from 'virtual-repeat-angular/virtual-repeat-angular-lib.module';
+//import { VirtualRepeatAngularLibModule } from 'virtual-repeat-angular';
 
 import { ListItemExample } from './list-item/list-item.component';
 

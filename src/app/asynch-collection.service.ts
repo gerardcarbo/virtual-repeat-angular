@@ -2,8 +2,9 @@ import { Injectable } from '@angular/core';
 import { RemoteService } from './remote.service';
 import { map } from 'rxjs/operators';
 
-//import { IAsynchCollection } from 'virtual-repeat-angular/virtual-repeat-asynch';
-import { IAsynchCollection, LoggerService} from 'virtual-repeat-angular';
+import { IAsynchCollection } from 'virtual-repeat-angular/virtual-repeat-asynch';
+import { LoggerService } from 'virtual-repeat-angular/logger.service';
+//import { IAsynchCollection, LoggerService} from 'virtual-repeat-angular';
 
 @Injectable({
   providedIn: 'root'
