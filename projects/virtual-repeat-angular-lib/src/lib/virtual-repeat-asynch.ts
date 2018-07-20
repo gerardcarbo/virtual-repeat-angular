@@ -78,6 +78,7 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
     protected measure() {
         if (!this._collection) return;
         this._isInMeasure = true;
+        this._virtualRepeatContainer.processing = true;
         this._collection.getLength().then((length) => {
             this._collectionLength = length;
             this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * length;

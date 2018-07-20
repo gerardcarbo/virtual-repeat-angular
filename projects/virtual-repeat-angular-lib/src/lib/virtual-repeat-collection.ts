@@ -130,9 +130,10 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T> implements OnChanges,
         this.logger.log("measure: exit");
     }
 
-    protected createView(index: number) {
+    protected createView(index: number): Promise<ViewRef> {
         let item = this._collection[index];
-        this.createViewForItem(index, item);
+        let view = this.createViewForItem(index, item);
+        return Promise.resolve(view);
     }
 }
 

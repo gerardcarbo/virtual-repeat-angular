@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { AsynchCollectionService } from './asynch-collection.service';
-import { ReactiveCollectionService } from './reactive-collection.service';
+import { ReactiveCollectionFactory, ReactiveCollectionService } from './reactive-collection.service';
+import { VirtualRepeatContainer } from 'virtual-repeat-angular/virtual-repeat-container';
+import { IReactiveCollection } from 'virtual-repeat-angular/virtual-repeat-reactive';
 
 const MOCK_DATA = require('./MOCK_DATA.json');
 
@@ -9,19 +11,31 @@ const MOCK_DATA = require('./MOCK_DATA.json');
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
+export class AppComponent implements OnInit {
 
-  collection: {id: number, image: string, content: string}[] = [];
-  config = {showCollection: true, showAsynch: true, showReactive: true};
+  collection: { id: number, image: string, content: string }[] = [];
+  config = { showArray: true, tableViewArray: false, showAsynch: true, tableViewAsynch: false, showReactive: true, tableViewReactive: false };
 
-  constructor(public asynchCollection: AsynchCollectionService<any>, public reactiveCollection: ReactiveCollectionService<any>){
+  @ViewChild('reactiveVirtualRepeatList') reactiveVirtualRepeatList: VirtualRepeatContainer;
+  @ViewChild('reactiveVirtualRepeatTable') reactiveVirtualRepeatTable: VirtualRepeatContainer;
+
+  public itemsLoading: boolean = false;
+
+  constructor(public asynchCollection: AsynchCollectionService<any>, public reactiveCollectionFactory: ReactiveCollectionFactory<any>,
+    public reactiveCollection: ReactiveCollectionService<any>) {
     this.config = JSON.parse(localStorage.getItem('AppComponentConfig')) || this.config;
   }
 
   ngOnInit(): void {
-    setTimeout(() => {
-        this.collection = MOCK_DATA;
-    }, 0); 
+    this.collection = MOCK_DATA;
+
+    /*this.reactiveVirtualRepeatList.processing$.subscribe((loading: boolean) => {
+      this.itemsLoading = loading;
+    });
+
+    this.reactiveVirtualRepeatTable.processing$.subscribe((loading: boolean) => {
+      this.itemsLoading = loading;
+    });*/
   }
 
   onChange() {

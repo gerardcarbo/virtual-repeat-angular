@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, Output, Input } from '@angular/core';
-import { Subscription, BehaviorSubject, Observable, fromEvent } from 'rxjs';
+import { Subscription, BehaviorSubject, Observable, fromEvent, Subject } from 'rxjs';
 import { filter, tap, map, debounceTime } from 'rxjs/operators';
 
 export const SCROLL_STOP_TIME_THRESHOLD = 200; // in milliseconds
@@ -107,6 +107,13 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
     _autoHeightVariable: boolean = false;
     _autoHeightVariableCount: number = 0;
     _autoHeightRequestedMeasure: boolean = false;
+
+    private _processingSubject = new Subject<boolean>();
+    public processing$ = this._processingSubject.asObservable();
+
+    set processing(l: boolean){
+        this._processingSubject.next(l);
+    }
  
     @Input()
     set newScrollPosition(p: number) {

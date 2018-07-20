@@ -1,11 +1,25 @@
 import { Injectable } from '@angular/core';
 import { RemoteService } from './remote.service';
 import { Subject, of, BehaviorSubject, Subscription, Observable, ReplaySubject } from 'rxjs';
-import { flatMap, map, distinct, filter, throttleTime, distinctUntilChanged, catchError } from 'rxjs/operators';
+import { flatMap, map, distinct, filter, throttleTime, distinctUntilChanged, catchError, share } from 'rxjs/operators';
 
-import { IReactiveCollection } from 'virtual-repeat-angular/virtual-repeat-reactive';
+import { IReactiveCollection, IReactiveCollectionFactory } from 'virtual-repeat-angular/virtual-repeat-reactive';
 import { LoggerService } from 'virtual-repeat-angular/logger.service';
-//import { IReactiveCollection, LoggerService } from 'virtual-repeat-angular';
+//import { IReactiveCollection, IReactiveCollectionFactory, LoggerService } from 'virtual-repeat-angular';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ReactiveCollectionFactory<T> implements IReactiveCollectionFactory<T> {
+  constructor(private remoteService: RemoteService, private logger: LoggerService) {
+  }
+
+  create(): IReactiveCollection<T> {
+    let reactiveCollection = new ReactiveCollectionService<T>(this.remoteService, this.logger);
+    reactiveCollection.connect();
+    return reactiveCollection;
+  }
+}
 
 @Injectable({
   providedIn: 'root'
@@ -32,14 +46,14 @@ export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
   connect() {
     this._requestLengthSubject = new BehaviorSubject(null);
     this._requestItemSubject = new ReplaySubject();
-    this._requestPageSubject = new ReplaySubject();
+    this._requestPageSubject = new Subject();
 
     this.length$ = this._requestLengthSubject.pipe(
       map(() => {
         this.logger.log("requestLengthSubject: enter");
         return this.remoteService.getCount();
       })
-    );
+    ); 
   
     this.items$ = this._requestItemSubject.pipe(
       flatMap((index) => {
@@ -59,7 +73,7 @@ export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
       catchError((error, caught) => {
         this.logger.log('items$: exception', error);
         return caught;
-      })
+      }),
     );
 
     this.pages$ = this._requestPageSubject.pipe(
