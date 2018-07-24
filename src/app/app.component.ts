@@ -3,6 +3,8 @@ import { AsynchCollectionService } from './asynch-collection.service';
 import { ReactiveCollectionFactory, ReactiveCollectionService } from './reactive-collection.service';
 import { VirtualRepeatContainer } from 'virtual-repeat-angular/virtual-repeat-container';
 import { IReactiveCollection } from 'virtual-repeat-angular/virtual-repeat-reactive';
+import { timeout } from '../../node_modules/rxjs/operators';
+import { FormControl } from '../../node_modules/@angular/forms';
 
 const MOCK_DATA = require('./MOCK_DATA.json');
 
@@ -13,12 +15,15 @@ const MOCK_DATA = require('./MOCK_DATA.json');
 })
 export class AppComponent implements OnInit {
 
-  collection: { id: number, image: string, content: string }[] = [];
   config = { showArray: true, tableViewArray: false, showAsynch: true, tableViewAsynch: false, showReactive: true, tableViewReactive: false };
 
-  @ViewChild('reactiveVirtualRepeatList') reactiveVirtualRepeatList: VirtualRepeatContainer;
-  @ViewChild('reactiveVirtualRepeatTable') reactiveVirtualRepeatTable: VirtualRepeatContainer;
 
+  @ViewChild('reactiveVirtualRepeatContainerList') reactiveVirtualRepeatContainerList: VirtualRepeatContainer;
+  @ViewChild('reactiveVirtualRepeatContainerTable') reactiveVirtualRepeatContainerTable: VirtualRepeatContainer;
+
+  tableViewReactive = new FormControl('');
+
+  collection: { id: number, image: string, content: string }[] = [];
   public itemsLoading: boolean = false;
 
   constructor(public asynchCollection: AsynchCollectionService<any>, public reactiveCollectionFactory: ReactiveCollectionFactory<any>,
@@ -27,15 +32,28 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.collection = MOCK_DATA;
+    setTimeout(() => {
+      this.collection = MOCK_DATA;
+    }, 100);
 
-    /*this.reactiveVirtualRepeatList.processing$.subscribe((loading: boolean) => {
-      this.itemsLoading = loading;
+    //capture processing$ notifications to display loading progress (only in reactive for demo purposes)
+    this. tableViewReactive.valueChanges.subscribe((viewTable: boolean) => {
+      if (viewTable) {
+        setTimeout(() => {
+          this.reactiveVirtualRepeatContainerTable && this.reactiveVirtualRepeatContainerTable.processing$
+            .subscribe((loading: boolean) => {
+              this.itemsLoading = loading;
+            });
+        }, 100);
+      } else {
+        setTimeout(() => {
+          this.reactiveVirtualRepeatContainerList && this.reactiveVirtualRepeatContainerList.processing$
+            .subscribe((loading: boolean) => {
+              this.itemsLoading = loading;
+            });
+        }, 100);
+      }
     });
-
-    this.reactiveVirtualRepeatTable.processing$.subscribe((loading: boolean) => {
-      this.itemsLoading = loading;
-    });*/
   }
 
   onChange() {

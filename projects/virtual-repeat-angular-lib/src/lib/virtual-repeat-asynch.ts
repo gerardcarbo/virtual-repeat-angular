@@ -89,7 +89,7 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
 
     protected createView(index: number, addBefore: boolean): Promise<ViewRef> {
         let view;
-        if (view = this._recycler.recoverView()) { //recover recycled views. Will be filled with new item once received.
+        if (!this._virtualRepeatContainer._autoHeightVariable && !!(view = this._recycler.recoverView())) { //recover recycled views. Will be filled with new item once received.
             let embedView = (<EmbeddedViewRef<VirtualRepeatRow>>view);
             embedView.context.index = index;
             embedView.rootNodes[0].style.height = this._virtualRepeatContainer._rowHeight + "px";

@@ -9,8 +9,11 @@
       </a>
     </h1>
   </div>
-  <div class="progress" [ngClass]="{'transparent': !itemsLoading}"><span></span></div>
+  <div class="progress" [ngClass]="{'transparent': !itemsLoading}">
+    <span></span>
+  </div>
   <div class="hbox flex margin">
+    <!-- LOCAL ARRAY -->
     <div class="vbox flex box" [ngStyle]="{'flex':config.showArray ? 1 : 0 }">
       <h2>
         <label for="showArray">
@@ -22,14 +25,12 @@
       </h2>
       <div class="display_flex flex box-shadow" *ngIf="config.showArray">
         <div class="expand" *ngIf="!config.tableViewArray">
-          <!-- display: block parent with full size needed-->
           <gc-virtual-repeat-container rowHeight="auto">
             <list-item-example *virtualRepeat="let row of collection; let i = index" [item]="row" [index]="i">
             </list-item-example>
           </gc-virtual-repeat-container>
         </div>
         <div class="expand" *ngIf="config.tableViewArray">
-          <!-- display: block parent with full size needed-->
           <gc-virtual-repeat-container rowHeight="auto">
             <table>
               <thead>
@@ -59,29 +60,28 @@
         </div>
       </div>
     </div>
+    <!-- ASYNCH -->
     <div class="vbox flex box" [ngStyle]="{'flex':config.showAsynch ? 1 : 0 }">
       <h2>
         <label for="showAsynch">
           <input type="checkbox" id="showAsynch" [(ngModel)]="config.showAsynch" (change)="onChange()"> Asynch Colletion
-          <label *ngIf="config.showAsynch">({{asynchCollection.getLength() | async}}# remote)</label>
+          <label *ngIf="config.showAsynch">(5000# remote)</label>
         </label>
         <label *ngIf="config.showAsynch" style="float: right" for="showAsynchImages">
           <input type="checkbox" name="showAsynchImages" [(ngModel)]="config.showAsynchImages" (change)="onChange()">
-          <label >Images</label>
+          <label>Images</label>
         </label>
         <label style="float: right" *ngIf="config.showAsynch">
           <input type="checkbox" name="tableViewAsynch" [(ngModel)]="config.tableViewAsynch" (change)="onChange()">Table View</label>
       </h2>
       <div class="display_flex flex box-shadow" *ngIf="config.showAsynch">
         <div class="expand" *ngIf="!config.tableViewAsynch">
-          <!-- display: block parent with full size needed-->
           <gc-virtual-repeat-container rowHeight="auto">
             <list-item-example *virtualRepeatAsynch="let row of asynchCollection; let i = index" [item]="row" [index]="i">
             </list-item-example>
           </gc-virtual-repeat-container>
         </div>
         <div class="expand" *ngIf="config.tableViewAsynch">
-          <!-- display: block parent with full size needed-->
           <gc-virtual-repeat-container rowHeight="auto">
             <table>
               <thead>
@@ -111,30 +111,29 @@
         </div>
       </div>
     </div>
+    <!-- REACTIVE -->
     <div class="vbox flex box" [ngStyle]="{'flex':config.showReactive ? 1 : 0 }">
       <h2>
         <label for="showReactive">
           <input type="checkbox" id="showReactive" [(ngModel)]="config.showReactive" (change)="onChange()"> Reactive Colletion
-          <label *ngIf="config.showReactive">({{reactiveCollection.length$ | async}}# remote)</label>
+          <label *ngIf="config.showReactive">(5000# remote)</label>
         </label>
         <label *ngIf="config.showReactive" style="float: right" for="showReactiveImages">
           <input type="checkbox" name="showReactiveImages" [(ngModel)]="config.showReactiveImages" (change)="onChange()">
-          <label >Images</label>
+          <label>Images</label>
         </label>
         <label style="float: right" *ngIf="config.showReactive">
-          <input type="checkbox" name="tableView" [(ngModel)]="config.tableViewReactive" (change)="onChange()">Table View</label>
+          <input type="checkbox" [formControl]="tableViewReactive" [(ngModel)]="config.tableViewReactive" (change)="onChange()">Table View</label>
       </h2>
-      <div class="display_flex flex vbox box-shadow" [ngClass]="{'hidden':!config.showReactive}">
-        <div class="expand" *ngIf="!config.tableViewReactive"> 
-          <!-- display: block parent with full size needed-->
-          <gc-virtual-repeat-container rowHeight="auto" #reactiveVirtualRepeatList>
+      <div class="display_flex flex vbox box-shadow" *ngIf="config.showReactive">
+        <div class="expand" *ngIf="!config.tableViewReactive">
+          <gc-virtual-repeat-container rowHeight="auto" #reactiveVirtualRepeatContainerList>
             <list-item-example *virtualRepeatReactive="let row of reactiveCollectionFactory; let i = index" [item]="row" [index]="i">
             </list-item-example>
           </gc-virtual-repeat-container>
-        </div>  
+        </div>
         <div class="expand" *ngIf="config.tableViewReactive">
-           <!-- display: block parent with full size needed -->
-          <gc-virtual-repeat-container rowHeight="auto" #reactiveVirtualRepeatTable>
+          <gc-virtual-repeat-container rowHeight="auto" #reactiveVirtualRepeatContainerTable>
             <table>
               <thead>
                 <tr>

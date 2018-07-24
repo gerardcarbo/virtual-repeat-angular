@@ -66,13 +66,17 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T> implements OnChanges,
         if ('virtualRepeatOf' in changes) {
             // React on virtualRepeatOf only once all inputs have been initialized
             const value = changes['virtualRepeatOf'].currentValue;
-            if (!this._differ && value) {
+            if (this._collection == undefined) {
+                this._collection = value;
+                this.requestMeasure.next();
+            } else if (!this._differ && value) {
                 try {
                     this._differ = this._differs.find(value).create(this._trackByFn);
                 } catch (e) {
                     throw new Error(`Cannot find a differ supporting object '${value}' of type '${getTypeNameForDebugging(value)}'. NgFor only supports binding to Iterables such as Arrays.`);
                 }
             }
+
         }
     }
 
@@ -99,12 +103,12 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T> implements OnChanges,
                 this._collection.splice(currentIndex, 0, item.item);
             } else if (currentIndex == null) {
                 // remove item
-                // this.logger.log('remove item', item, adjustedPreviousIndex, currentIndex);
+                this.logger.log('remove item', item, adjustedPreviousIndex, currentIndex);
                 isMeasurementRequired = true;
                 this._collection.splice(adjustedPreviousIndex, 1);
             } else {
                 // move item
-                // this.logger.log('move item', item, adjustedPreviousIndex, currentIndex);
+                this.logger.log('move item', item, adjustedPreviousIndex, currentIndex);
                 this._collection.splice(currentIndex, 0, this._collection.splice(adjustedPreviousIndex, 1)[0]);
             }
         });
@@ -115,9 +119,9 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T> implements OnChanges,
 
         if (isMeasurementRequired) {
             this.requestMeasure.next();
+        } else {
+            this.requestLayout.next();
         }
-
-        this.requestLayout.next();
     }
 
     protected measure() {

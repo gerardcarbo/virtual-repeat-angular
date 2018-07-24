@@ -28,12 +28,11 @@ export interface IReactiveCollectionFactory<T> {
 export interface IReactiveCollection<T> {
   connect(): void;
   disconnect(): void;  
-
-  length$: Observable<number>;
-  items$: Observable<{ index: number, item: T }>
-
   requestLength(): void;
   requestItem(index: number): void;
+  
+  length$: Observable<number>;
+  items$: Observable<{ index: number, item: T }>
 }
 
 export class Deferred<T> {
@@ -152,12 +151,12 @@ export class VirtualRepeatReactive<T> extends VirtualRepeatBase<T> implements On
   protected createView(index: number, addBefore: boolean): Promise<ViewRef> {
     this.logger.log("createView: requestItem: ", index);
     let view;
-    if(view = this._recycler.recoverView()) { //recover recycled views. Will be filled with new item once received.
+    if(!this._virtualRepeatContainer._autoHeightVariable && !!(view = this._recycler.recoverView())) { //recover recycled views. Will be filled with new item once received.
       let embedView = (<EmbeddedViewRef<VirtualRepeatRow>>view);
       embedView.context.index = index;
       embedView.rootNodes[0].style.height = this._virtualRepeatContainer._rowHeight + "px";
       embedView.context.$implicit = this.emptyItem(embedView.context.$implicit);
-      view.reattach();
+      embedView.context.recycled = true;
       this._viewContainerRef.insert(view, (addBefore ? 0 : undefined));
     }
 
@@ -169,19 +168,17 @@ export class VirtualRepeatReactive<T> extends VirtualRepeatBase<T> implements On
   }
 
   onItem(data: { index: number, item: T }) {
-    this.logger.log("onItem: enter", data);
     const { index, item } = data;
+    this.logger.log("onItem: enter", index, item);
     let view = this.createViewForItem(index, item);
     if(this._viewDeferreds[index]){
         this.logger.log("onItem: _viewPromises resolve: ", index);
         this._viewDeferreds[index].resolve(view);
-    } else {
-      debugger;
-    }
+    } 
   }
 
   onProcessing(processing: boolean): any {
-    if(!processing) {
+    if(!processing) { //processing finished
       this.logger.log("onProcessing: _viewDeferreds deleting");
       this._viewDeferreds = [];
     }
