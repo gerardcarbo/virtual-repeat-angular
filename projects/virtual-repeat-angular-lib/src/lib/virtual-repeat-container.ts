@@ -1,7 +1,7 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, Output, Input } from '@angular/core';
 import { Subscription, BehaviorSubject, Observable, fromEvent, Subject, timer } from 'rxjs';
 import { filter, tap, map, debounceTime, pairwise, throttleTime, delay } from 'rxjs/operators';
-import { LoggerService } from 'virtual-repeat-angular/logger.service';
+import { LoggerService } from './logger.service';
 
 export const SCROLL_STOP_TIME_THRESHOLD = 200; // in milliseconds
 
