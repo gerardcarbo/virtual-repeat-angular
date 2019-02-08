@@ -1,25 +1,34 @@
-.gc-virtual-repeat-container {
+::ng-deep gc-virtual-repeat-container {
+    display: block;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    width: 100%;
+    height: 100%;
     overflow-y: hidden;
     position: relative;
-    contain: layout;
     -webkit-overflow-scrolling: touch;
-    .gc-virtual-repeat-container-holder {
-      width: 100%;
-      //position: relative;
-    }
-    &.normal {
-      overflow-y: auto;
+
+    .gc-virtual-repeat-scroller {
+      overflow: auto;
+      bottom: 0;
+      box-sizing: border-box;
+      left: 0;
+      margin: 0;
       overflow-x: hidden;
+      padding: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
       width: 100%;
       height: 100%;
+      -webkit-overflow-scrolling: touch;
     }
-    &.hide-scrollbar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
+
+    .gc-virtual-repeat-container-holder {
+      width: 100%;
     }
+
     .gc-virtual-repeat-offsetter {
       box-sizing: border-box;
       left: 0;
@@ -28,6 +37,14 @@
       position: absolute;
       right: 0;
       top: 0;
+      flex-direction: column;
+    }
+
+    &.hide-scrollbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
     }
   }
-  

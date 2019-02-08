@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular/virtual-repeat-container';
-//import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular';
+// import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular';
 
 @Component({
     selector: 'list-item-example',
@@ -11,7 +11,7 @@ import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular/vir
             width: 100%;
             height: 140px;
             padding: 1px;
-            box-sizing: border-box; 
+            box-sizing: border-box;
         }
         .list-item-wrapper {
             background-color: #fff;
@@ -42,7 +42,7 @@ import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular/vir
         .index-label {
             padding: 0.5rem;
             background-color: #eaeaea;
-            height: 20px 
+            height: 20px
         }
     `]
 })
@@ -50,6 +50,7 @@ export class ListItemExample implements OnDestroy {
     @Input() item;
 
     @Input() index;
+    @Input() showImage = true;
 
     private _subscription = new Subscription();
 

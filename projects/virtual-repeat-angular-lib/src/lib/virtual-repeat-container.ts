@@ -2,6 +2,7 @@ import { Component, ViewChild, ElementRef, AfterViewInit, OnDestroy, Output, Inp
 import { Subscription, BehaviorSubject, Observable, fromEvent, Subject, timer } from 'rxjs';
 import { filter, tap, map, debounceTime, pairwise, throttleTime, delay } from 'rxjs/operators';
 import { LoggerService } from './logger.service';
+import { IVirtualRepeat } from './virtual-repeat.base';
 
 export const SCROLL_STOP_TIME_THRESHOLD = 200; // in milliseconds
 
@@ -12,29 +13,11 @@ const INVALID_POSITION = -1;
   templateUrl: './virtual-repeat-container.html',
   styleUrls: ['./virtual-repeat-container.scss']
 })
+// tslint:disable-next-line:component-class-suffix
 export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
-  private _holderHeight: number = 0;
-  private _containerWidth: number = 0;
-  private _containerHeight: number = 0;
-  
-  public translateY: number = 0;
-
-  private _subscription: Subscription = new Subscription();
-
-  private _scrollStateChange: BehaviorSubject<SCROLL_STATE> = new BehaviorSubject(SCROLL_STATE.IDLE);
-  private _scrollPosition: BehaviorSubject<number> = new BehaviorSubject(0);
-  private _sizeChange: BehaviorSubject<number[]> = new BehaviorSubject([0, 0]);
-
-  private _ignoreScrollEvent = false;
-
-  private _initialScrollTop = INVALID_POSITION;
-
-  private _currentScrollState: SCROLL_STATE = SCROLL_STATE.IDLE;
-
-  @ViewChild('listContainer') listContainer: ElementRef;
-
-  scrollbarStyle: string;
-  scrollbarWidth: number;
+  set virtualRepeat(virtualRepeat: IVirtualRepeat) {
+    this._virtualRepeat = virtualRepeat;
+  }
 
   get currentScrollState(): SCROLL_STATE {
     return this._currentScrollState;
@@ -46,7 +29,8 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
       if (this._holderHeight === 0) {
         this.listContainer.nativeElement.scrollTop = 0;
       }
-      // When initialization, the list-holder doesn't not have its height. So the scrollTop should be delayed for waiting
+      // When initialization, the list-holder doesn't not have its height.
+      // So the scrollTop should be delayed for waiting
       // the list-holder rendered bigger than the list-container.
       if (this._initialScrollTop !== INVALID_POSITION && this._holderHeight !== 0) {
         setTimeout(() => {
@@ -88,39 +72,23 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
   }
 
   /**
-   * list container width and height.
+   * container width and height.
    */
-  get sizeChange(): Observable<number[]> {
+  get sizeChange(): Observable<[number, number]> {
     return this._sizeChange.asObservable();
   }
 
   @Input() set rowHeight(rowHeight: string) {
-    if (rowHeight != undefined) {
-      if (rowHeight != "auto") {
+    if (rowHeight !== undefined) {
+      if (rowHeight !== 'auto') {
         this._rowHeight = Number(rowHeight);
         this._autoHeight = false;
-
       } else {
         this._autoHeight = true;
         this._autoHeightComputed = false;
       }
     }
   }
-
-  _rowHeight: number = 100;
-  _autoHeight: boolean = false;
-  _autoHeightComputed: boolean = false;
-  _autoHeightVariable: boolean = false;
-  _autoHeightVariableData: { itemsCount: number, totalHeight: number } = { itemsCount: 0, totalHeight: 0 }
-
-  private _processingVal0 = false;
-  private _processingVal1 = false;
-  private _processingSubject = new Subject<boolean>();
-  public processingRaw$ = this._processingSubject.asObservable();
-  public processing$ = this._processingSubject.pipe(
-    tap((x) => {this._processingVal0 = x; if(!x) {timer(1000)}}),
-    //filter(x => x == false && this._processingVal0 != x)
-  );
 
   set processing(l: boolean) {
     this._processingSubject.next(l);
@@ -146,18 +114,53 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
     this.scrollbarStyle = 'normal';
     this.scrollbarWidth = getScrollBarWidth();
   }
+  private _holderHeight = 0;
+  private _containerWidth = 0;
+  private _containerHeight = 0;
+  public translateY = 0;
+
+  private _subscription: Subscription = new Subscription();
+
+  private _scrollStateChange: BehaviorSubject<SCROLL_STATE> = new BehaviorSubject(SCROLL_STATE.IDLE);
+  private _scrollPosition: BehaviorSubject<number> = new BehaviorSubject(0);
+  private _sizeChange: BehaviorSubject<[number, number]> = new BehaviorSubject<[number, number]>([0, 0]);
+
+  private _ignoreScrollEvent = false;
+
+  private _initialScrollTop = INVALID_POSITION;
+
+  private _currentScrollState: SCROLL_STATE = SCROLL_STATE.IDLE;
+
+  @ViewChild('listContainer') listContainer: ElementRef;
+
+  scrollbarStyle: string;
+  scrollbarWidth: number;
+
+  private _virtualRepeat: IVirtualRepeat;
+
+  _rowHeight = 100;
+  _autoHeight = false;
+  _autoHeightComputed = false;
+  _autoHeightVariable = false;
+  _autoHeightVariableData: { itemsCount: number; totalHeight: number } = { itemsCount: 0, totalHeight: 0 };
+
+  /* private _processingVal0 = false; */
+  private _processingSubject = new Subject<boolean>();
+  public processingRaw$ = this._processingSubject.asObservable();
+  public processing$ = this._processingSubject.asObservable(); // TODO: filter glitches
 
   ngAfterViewInit(): void {
     if (this.scrollbarStyle === 'hide-scrollbar') {
-      this.listContainer.nativeElement.style.right = (0 - this.scrollbarWidth) + 'px';
+      this.listContainer.nativeElement.style.right = 0 - this.scrollbarWidth + 'px';
       this.listContainer.nativeElement.style.paddingRight = this.scrollbarWidth + 'px';
     }
 
     if (window) {
-      this._subscription.add(fromEvent(window, 'resize')
-        .subscribe(() => {
-          this.requestMeasure();
-        }));
+      this._subscription.add(
+        fromEvent(window, 'resize').subscribe(() => {
+          this.resize();
+        })
+      );
     }
     this._subscription.add(
       fromEvent(this.listContainer.nativeElement, 'scroll')
@@ -175,7 +178,8 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
         )
         .subscribe((scrollY: number) => {
           this._scrollPosition.next(scrollY);
-        }));
+        })
+    );
 
     this._subscription.add(
       this.scrollPosition
@@ -189,24 +193,23 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
           pairwise(),
           map(pair => {
             if (Math.abs(pair[1] - pair[0]) > 10) {
-              this._currentScrollState = (pair[1] - pair[0] > 0 ? SCROLL_STATE.SCROLLING_DOWN : SCROLL_STATE.SCROLLING_UP);
-              this.logger.log(`scrollPosition pair: ${pair} _currentScrollState: ${this._currentScrollState}`)
+              this._currentScrollState =
+                pair[1] - pair[0] > 0 ? SCROLL_STATE.SCROLLING_DOWN : SCROLL_STATE.SCROLLING_UP;
+              this.logger.log(`scrollPosition pair: ${pair} _currentScrollState: ${this._currentScrollState}`);
               this._scrollStateChange.next(this._currentScrollState);
             }
           }),
           debounceTime(SCROLL_STOP_TIME_THRESHOLD)
         )
-        .subscribe(
-          () => {
-            if (this._currentScrollState != SCROLL_STATE.IDLE) {
-              //this.currentScrollState = SCROLL_STATE.IDLE;
-              this._scrollStateChange.next(SCROLL_STATE.IDLE);
-            }
+        .subscribe(() => {
+          if (this._currentScrollState !== SCROLL_STATE.IDLE) {
+            this._scrollStateChange.next(SCROLL_STATE.IDLE);
           }
-        ));
+        })
+    );
 
     setTimeout(() => {
-      this.requestMeasure();
+      this.resize();
     });
   }
 
@@ -214,9 +217,9 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
     this._subscription.unsubscribe();
   }
 
-  measure(): { width: number, height: number } {
+  getContainerSize(): { width: number; height: number } {
     if (this.listContainer && this.listContainer.nativeElement) {
-      let rect = this.listContainer.nativeElement.getBoundingClientRect();
+      const rect = this.listContainer.nativeElement.getBoundingClientRect();
       this._containerWidth = rect.width - this.scrollbarWidth;
       this._containerHeight = rect.height;
       return { width: this._containerWidth, height: this._containerHeight };
@@ -224,8 +227,13 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
     return { width: 0, height: 0 };
   }
 
-  requestMeasure() {
-    let { width, height } = this.measure();
+  reset() {
+    this.newScrollPosition = 0;
+    this._virtualRepeat.reset();
+  }
+
+  resize() {
+    const { width, height } = this.getContainerSize();
     this._sizeChange.next([width, height]);
   }
 }
@@ -233,35 +241,34 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
 export enum SCROLL_STATE {
   IDLE,
   SCROLLING_DOWN,
-  SCROLLING_UP,
+  SCROLLING_UP
 }
 
 export function getScrollBarWidth() {
-  let inner = document.createElement('p');
-  inner.style.width = "100%";
-  inner.style.height = "200px";
+  const inner = document.createElement('p');
+  inner.style.width = '100%';
+  inner.style.height = '200px';
 
-  let outer = document.createElement('div');
-  outer.style.position = "absolute";
-  outer.style.top = "0px";
-  outer.style.left = "0px";
-  outer.style.visibility = "hidden";
-  outer.style.width = "200px";
-  outer.style.height = "150px";
-  outer.style.overflow = "hidden";
+  const outer = document.createElement('div');
+  outer.style.position = 'absolute';
+  outer.style.top = '0px';
+  outer.style.left = '0px';
+  outer.style.visibility = 'hidden';
+  outer.style.width = '200px';
+  outer.style.height = '150px';
+  outer.style.overflow = 'hidden';
   outer.appendChild(inner);
 
   document.body.appendChild(outer);
-  let w1 = inner.offsetWidth;
+  const w1 = inner.offsetWidth;
   outer.style.overflow = 'scroll';
   let w2 = inner.offsetWidth;
 
-  if (w1 == w2) {
+  if (w1 === w2) {
     w2 = outer.clientWidth;
   }
 
   document.body.removeChild(outer);
 
-  return (w1 - w2);
+  return w1 - w2;
 }
-

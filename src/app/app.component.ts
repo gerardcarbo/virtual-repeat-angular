@@ -1,12 +1,15 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { AsynchCollectionService } from './asynch-collection.service';
-import { ReactiveCollectionFactory, ReactiveCollectionService } from './reactive-collection.service';
+import {
+  ReactiveCollectionFactory,
+  ReactiveCollectionService
+} from './reactive-collection.service';
 import { VirtualRepeatContainer } from 'virtual-repeat-angular/virtual-repeat-container';
-import { IReactiveCollection } from 'virtual-repeat-angular/virtual-repeat-reactive';
-import { timeout } from '../../node_modules/rxjs/operators';
 import { FormControl } from '../../node_modules/@angular/forms';
 
 const MOCK_DATA = require('./MOCK_DATA.json');
+
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -14,21 +17,36 @@ const MOCK_DATA = require('./MOCK_DATA.json');
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  config = {
+    showArray: true,
+    tableViewArray: false,
+    showAsynch: true,
+    tableViewAsynch: false,
+    showAsynchImages: true,
+    showReactive: true,
+    tableViewReactive: false,
+    showReactiveImages: true,
+  };
 
-  config = { showArray: true, tableViewArray: false, showAsynch: true, tableViewAsynch: false, showReactive: true, tableViewReactive: false };
-
-
-  @ViewChild('reactiveVirtualRepeatContainerList') reactiveVirtualRepeatContainerList: VirtualRepeatContainer;
-  @ViewChild('reactiveVirtualRepeatContainerTable') reactiveVirtualRepeatContainerTable: VirtualRepeatContainer;
+  @ViewChild('reactiveVirtualRepeatContainerList')
+  reactiveVirtualRepeatContainerList: VirtualRepeatContainer;
+  @ViewChild('reactiveVirtualRepeatContainerTable')
+  reactiveVirtualRepeatContainerTable: VirtualRepeatContainer;
 
   tableViewReactive = new FormControl('');
 
-  collection: { id: number, image: string, content: string }[] = [];
-  public itemsLoading: boolean = false;
+  collection: { id: number; image: string; content: string }[] = [];
+  public itemsLoading = false;
 
-  constructor(public asynchCollection: AsynchCollectionService<any>, public reactiveCollectionFactory: ReactiveCollectionFactory<any>,
-    public reactiveCollection: ReactiveCollectionService<any>) {
-    this.config = JSON.parse(localStorage.getItem('AppComponentConfig')) || this.config;
+  public version: string = environment.VERSION;
+
+  constructor(
+    public asynchCollection: AsynchCollectionService<any>,
+    public reactiveCollectionFactory: ReactiveCollectionFactory<any>,
+    public reactiveCollection: ReactiveCollectionService<any>
+  ) {
+    this.config =
+      JSON.parse(localStorage.getItem('AppComponentConfig')) || this.config;
   }
 
   ngOnInit(): void {
@@ -37,20 +55,24 @@ export class AppComponent implements OnInit {
     }, 100);
 
     //capture processing$ notifications to display loading progress (only in reactive for demo purposes)
-    this. tableViewReactive.valueChanges.subscribe((viewTable: boolean) => {
+    this.tableViewReactive.valueChanges.subscribe((viewTable: boolean) => {
       if (viewTable) {
         setTimeout(() => {
-          this.reactiveVirtualRepeatContainerTable && this.reactiveVirtualRepeatContainerTable.processing$
-            .subscribe((loading: boolean) => {
-              this.itemsLoading = loading;
-            });
+          this.reactiveVirtualRepeatContainerTable &&
+            this.reactiveVirtualRepeatContainerTable.processing$.subscribe(
+              (loading: boolean) => {
+                this.itemsLoading = loading;
+              }
+            );
         }, 100);
       } else {
         setTimeout(() => {
-          this.reactiveVirtualRepeatContainerList && this.reactiveVirtualRepeatContainerList.processing$
-            .subscribe((loading: boolean) => {
-              this.itemsLoading = loading;
-            });
+          this.reactiveVirtualRepeatContainerList &&
+            this.reactiveVirtualRepeatContainerList.processing$.subscribe(
+              (loading: boolean) => {
+                this.itemsLoading = loading;
+              }
+            );
         }, 100);
       }
     });

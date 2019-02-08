@@ -45,19 +45,30 @@ interface IAsynchCollection<T> {
 Where **reactiveCollection** object must implement:
 
 ``` typescript
-interface IReactiveCollection<T> {
+export interface IReactiveCollection<T> {
+  length$: Observable<number>;
+  items$: Observable<{ index: number; item: T }>;
+  reset$: Observable<boolean>;
+
   connect(): void;
-  disconnect(): void;  
+  disconnect(): void;
+
+  reset(): void;
+
   requestLength(): void;
   requestItem(index: number): void;
-  
-  length$: Observable<number>;
-  items$: Observable<{ index: number, item: T }>
 }
 ```
 
-For each call to *requestLength()* the observable *length$* must emit a value. 
-For each call to *requestItem()* the observable *requestItem$* must emit an item. 
+For each call to *requestLength()* the observable *length$* must emit the collection's length. 
+
+For each call to *requestItem()* the observable *requestItem$* must emit the collection's item at the 'index' position (zero based). 
+
+For each call to *reset()* the collection must clean its internal state and the observable *reset$* must emit some boolean (its value is not used). The virtual repeat library will request the data again. 
+
+This method must be called by the library's client when the data set to show has changed, because of a sort / filter operation on it, or because it's known that an item has been added or deleted.  
+
+The *connect / disconnect* methods will be called by the virtual repeat library.
 
 ## Parameters
 

@@ -2,10 +2,10 @@ import { CommonModule } from '@angular/common';
 import { TestBed, inject } from '@angular/core/testing';
 
 import { IterableDiffers, TemplateRef, ViewContainerRef } from '@angular/core';
-import { VirtualRepeat } from './virtual-repeat-collection';
-import { VirtualRepeatContainer } from './virtual-repeat-container';
-import { VirtualRepeatRow } from './virtual-repeat.base';
-import { LoggerService } from './logger.service';
+import { VirtualRepeat } from '@app/shared/grid/virtual-repeat/virtual-repeat-collection';
+import { VirtualRepeatContainer } from '@app/shared/grid/virtual-repeat/virtual-repeat-container';
+import { VirtualRepeatRow } from '@app/shared/grid/virtual-repeat/virtual-repeat.base';
+import { LoggerService } from '@app/shared/grid/virtual-repeat/logger.service';
 
 describe('VirtualRepeat', () => {
 

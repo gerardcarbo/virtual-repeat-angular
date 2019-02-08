@@ -1,11 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { TestBed, inject } from '@angular/core/testing';
 
-import { VirtualRepeatReactive } from './virtual-repeat-reactive';
+import { VirtualRepeatReactive } from '@app/shared/grid/virtual-repeat/virtual-repeat-reactive';
 import { IterableDiffers, TemplateRef, ViewContainerRef } from '@angular/core';
-import { VirtualRepeatContainer } from './virtual-repeat-container';
-import { VirtualRepeatRow } from './virtual-repeat.base';
-import { LoggerService } from './logger.service';
+import { VirtualRepeatContainer } from '@app/shared/grid/virtual-repeat/virtual-repeat-container';
+import { VirtualRepeatRow } from '@app/shared/grid/virtual-repeat/virtual-repeat.base';
+import { LoggerService } from '@app/shared/grid/virtual-repeat/logger.service';
 
 describe('VirtualRepeat', () => {
   beforeEach(() => {
