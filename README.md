@@ -2,6 +2,10 @@
 
 Synchronous / Asynchronous / Reactive Virtual Repeat implementation for Angular 2+. Supports variable height rows.
 
+# Install
+
+npm i virtual-repeat-angular
+
 # Usage
 
 ## Synchronous
