@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VirtualRepeatContainer } from '@app/shared/grid/virtual-repeat/virtual-repeat-container';
+import { VirtualRepeatContainer } from './virtual-repeat-container';
+import { LoggerService } from '../public_api';
 
 describe('VirtualRepeatContainer', () => {
   let component: VirtualRepeatContainer;
@@ -8,7 +9,10 @@ describe('VirtualRepeatContainer', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ VirtualRepeatContainer ]
+      declarations: [ VirtualRepeatContainer ],
+      providers: [
+        VirtualRepeatContainer, LoggerService
+      ]
     })
     .compileComponents();
   }));

@@ -31,12 +31,12 @@ a {
 }
 
 h1 {
-  font-size: 24px !important;  
+  font-size: 24px !important;
   color: rgb(255, 255, 255)
 }
 
 h2 {
-  font-size: 18px !important;  
+  font-size: 18px !important;
   font-weight: 100;
 }
 
@@ -120,7 +120,7 @@ div .progress {
   height: 2px;
   width: 50px;
   display: block;
-  -webkit-animation: progress-move 2s infinite linear; 
+  -webkit-animation: progress-move 2s infinite linear;
   animation: progress-move 2s infinite linear;
   transform: translateZ(0);
 }
@@ -128,4 +128,12 @@ div .progress {
 @keyframes progress-move {
   from   {width: 0%;margin-left: 0%}
   to  {width: 50%;margin-left: 50%}
+}
+
+.absolute {
+  position: absolute;
+}
+
+.relative {
+  position: relative;
 }

@@ -19,13 +19,14 @@ import { environment } from '../environments/environment';
 export class AppComponent implements OnInit {
   config = {
     showArray: true,
+    showArrayImages: true,
     tableViewArray: false,
     showAsynch: true,
     tableViewAsynch: false,
     showAsynchImages: true,
     showReactive: true,
     tableViewReactive: false,
-    showReactiveImages: true,
+    showReactiveImages: true
   };
 
   @ViewChild('reactiveVirtualRepeatContainerList')
@@ -36,7 +37,7 @@ export class AppComponent implements OnInit {
   tableViewReactive = new FormControl('');
 
   collection: { id: number; image: string; content: string }[] = [];
-  public itemsLoading = false;
+  public processing = false;
 
   public version: string = environment.VERSION;
 
@@ -54,25 +55,27 @@ export class AppComponent implements OnInit {
       this.collection = MOCK_DATA;
     }, 100);
 
-    //capture processing$ notifications to display loading progress (only in reactive for demo purposes)
+    // capture processing$ notifications to display loading progress (only in reactive for demo purposes)
     this.tableViewReactive.valueChanges.subscribe((viewTable: boolean) => {
       if (viewTable) {
         setTimeout(() => {
-          this.reactiveVirtualRepeatContainerTable &&
+          if (this.reactiveVirtualRepeatContainerTable) {
             this.reactiveVirtualRepeatContainerTable.processing$.subscribe(
-              (loading: boolean) => {
-                this.itemsLoading = loading;
+              (processing: boolean) => {
+                this.processing = processing;
               }
             );
+          }
         }, 100);
       } else {
         setTimeout(() => {
-          this.reactiveVirtualRepeatContainerList &&
+          if (this.reactiveVirtualRepeatContainerList) {
             this.reactiveVirtualRepeatContainerList.processing$.subscribe(
-              (loading: boolean) => {
-                this.itemsLoading = loading;
+              (processing: boolean) => {
+                this.processing = processing;
               }
             );
+          }
         }, 100);
       }
     });

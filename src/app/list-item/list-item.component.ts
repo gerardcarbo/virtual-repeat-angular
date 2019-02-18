@@ -4,6 +4,7 @@ import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular/vir
 // import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular';
 
 @Component({
+    // tslint:disable-next-line:component-selector
     selector: 'list-item-example',
     templateUrl: './list-item.html',
     styles: [`
@@ -46,6 +47,7 @@ import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular/vir
         }
     `]
 })
+// tslint:disable-next-line:component-class-suffix
 export class ListItemExample implements OnDestroy {
     @Input() item;
 

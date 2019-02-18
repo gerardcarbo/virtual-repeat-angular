@@ -84,7 +84,7 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
         this._virtualRepeatContainer.processing = true;
         this._collection.getLength().then((length) => {
             this._collectionLength = length;
-            this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * length;
+            this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer.getRowHeight() * length;
             this._isInMeasure = false;
             this.requestLayout.next();
         });
@@ -96,7 +96,7 @@ export class VirtualRepeatAsynch<T> extends VirtualRepeatBase<T> implements OnCh
             // recover recycled views. Will be filled with new item once received.
             const embedView = (<EmbeddedViewRef<VirtualRepeatRow>>view);
             embedView.context.index = index;
-            embedView.rootNodes[0].style.height = this._virtualRepeatContainer._rowHeight + 'px';
+            embedView.rootNodes[0].style.height = this._virtualRepeatContainer.getRowHeight() + 'px';
             embedView.context.$implicit = this.emptyItem(embedView.context.$implicit);
             view.reattach();
             this._viewContainerRef.insert(view, (addBefore ? 0 : undefined));
