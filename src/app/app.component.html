@@ -20,13 +20,15 @@
           <input type="checkbox" id="showArray" [(ngModel)]="config.showArray" (change)="onChange()"> Array
           <label *ngIf="config.showArray">({{collection.length}}# local)</label>
         </label>
+        <label *ngIf="config.showAsynch" style="float: right">
+          <input type="checkbox" name="showArrayImages" [(ngModel)]="config.showArrayImages" (change)="onChange()">Images</label>
         <label style="float: right" *ngIf="config.showArray">
           <input type="checkbox" name="tableViewArray" [(ngModel)]="config.tableViewArray" (change)="onChange()">Table View</label>
       </h2>
       <div class="display_flex flex box-shadow" *ngIf="config.showArray">
         <div class="expand" *ngIf="!config.tableViewArray">
           <gc-virtual-repeat-container rowHeight="auto">
-            <list-item-example *virtualRepeat="let row of collection; let i = index" [item]="row" [index]="i" [showImage]="true">
+            <list-item-example *virtualRepeat="let row of collection; let i = index" [item]="row" [index]="i" [showImage]="config.showArrayImages">
             </list-item-example>
           </gc-virtual-repeat-container>
         </div>
@@ -35,7 +37,7 @@
             <table>
               <thead>
                 <tr>
-                  <td style="width:10%">Img</td>
+                  <td *ngIf="config.showArrayImages" style="width:10%">Img</td>
                   <td style="width:10%">Id</td>
                   <td style="width:60%">Title</td>
                   <td style="width:10%">OtherId</td>
@@ -44,7 +46,7 @@
               </thead>
               <tbody>
                 <tr *virtualRepeat="let row of collection; let i = index">
-                  <td style="width:10%">
+                  <td *ngIf="config.showArrayImages" style="width:10%">
                     <img src='{{row.thumbnailUrl}}' height="48px">
                   </td>
                   <td style="width:10%">{{row.id}}</td>
@@ -67,10 +69,8 @@
           <input type="checkbox" id="showAsynch" [(ngModel)]="config.showAsynch" (change)="onChange()"> Asynch Colletion
           <label *ngIf="config.showAsynch">(5000# remote)</label>
         </label>
-        <label *ngIf="config.showAsynch" style="float: right" for="showAsynchImages">
-          <input type="checkbox" name="showAsynchImages" [(ngModel)]="config.showAsynchImages" (change)="onChange()">
-          <label>Images</label>
-        </label>
+        <label *ngIf="config.showAsynch" style="float: right">
+          <input type="checkbox" name="showAsynchImages" [(ngModel)]="config.showAsynchImages" (change)="onChange()">Images</label>
         <label style="float: right" *ngIf="config.showAsynch">
           <input type="checkbox" name="tableViewAsynch" [(ngModel)]="config.tableViewAsynch" (change)="onChange()">Table View</label>
       </h2>
@@ -119,9 +119,7 @@
           <label *ngIf="config.showReactive">(5000# remote)</label>
         </label>
         <label *ngIf="config.showReactive" style="float: right" for="showReactiveImages">
-          <input type="checkbox" name="showReactiveImages" [(ngModel)]="config.showReactiveImages" (change)="onChange()">
-          <label>Images</label>
-        </label>
+          <input type="checkbox" name="showReactiveImages" [(ngModel)]="config.showReactiveImages" (change)="onChange()">Images</label>
         <label style="float: right" *ngIf="config.showReactive">
           <input type="checkbox" [formControl]="tableViewReactive" [(ngModel)]="config.tableViewReactive" (change)="onChange()">Table View</label>
       </h2>

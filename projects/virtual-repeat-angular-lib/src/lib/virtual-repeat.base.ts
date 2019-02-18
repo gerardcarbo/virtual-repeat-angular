@@ -245,7 +245,7 @@ export abstract class VirtualRepeatBase<T>
             return (
               scrollY === 0 ||
               Math.abs(scrollY - this._scrollY) >=
-                (this._virtualRepeatContainer._rowHeight * this._guardItems) / 2
+                (this._virtualRepeatContainer.getRowHeight() * this._guardItems) / 2
             );
           })
         )
@@ -356,7 +356,7 @@ export abstract class VirtualRepeatBase<T>
 
     if (this._virtualRepeatContainer._autoHeightVariable) {
       this._virtualRepeatContainer.holderHeight =
-        this._virtualRepeatContainer._rowHeight * this._collectionLength;
+        this._virtualRepeatContainer.getRowHeight() * this._collectionLength;
 
       firstPosition = Math.floor(
         this._collectionLength *
@@ -364,7 +364,7 @@ export abstract class VirtualRepeatBase<T>
       );
       const lastPosition =
         Math.ceil(
-          this._containerHeight / this._virtualRepeatContainer._rowHeight
+          this._containerHeight / this._virtualRepeatContainer.getRowHeight()
         ) + firstPosition;
       this._firstRequestedItemIndex = Math.max(
         firstPosition - this._guardItems,
@@ -386,14 +386,14 @@ export abstract class VirtualRepeatBase<T>
       );
     } else {
       firstPosition = Math.floor(
-        this._scrollY / this._virtualRepeatContainer._rowHeight
+        this._scrollY / this._virtualRepeatContainer.getRowHeight()
       );
       const firstPositionOffset =
-        this._scrollY - firstPosition * this._virtualRepeatContainer._rowHeight;
+        this._scrollY - firstPosition * this._virtualRepeatContainer.getRowHeight();
       const lastPosition =
         Math.ceil(
           (this._containerHeight + firstPositionOffset) /
-            this._virtualRepeatContainer._rowHeight
+            this._virtualRepeatContainer.getRowHeight()
         ) + firstPosition;
       this._firstRequestedItemIndex = Math.max(
         firstPosition - this._guardItems,
@@ -408,11 +408,11 @@ export abstract class VirtualRepeatBase<T>
       }
 
       this._virtualRepeatContainer.translateY =
-        this._firstRequestedItemIndex * this._virtualRepeatContainer._rowHeight;
+        this._firstRequestedItemIndex * this._virtualRepeatContainer.getRowHeight();
       this.logger.log(
         `findRequestedIndexesRange: translateY: ${
           this._virtualRepeatContainer.translateY
-        } rowHeight: ${this._virtualRepeatContainer._rowHeight}`
+        } rowHeight: ${this._virtualRepeatContainer.getRowHeight()}`
       );
       this.logger.log(
         `findRequestedIndexesRange: firstRequestedItemPosition: ${
@@ -627,7 +627,7 @@ export abstract class VirtualRepeatBase<T>
   ) {
     const viewContent = view.rootNodes[0];
     if (!this._virtualRepeatContainer._autoHeight) {
-      viewContent.style.height = `${this._virtualRepeatContainer._rowHeight}px`;
+      viewContent.style.height = `${this._virtualRepeatContainer.getRowHeight()}px`;
     } else {
       viewContent.style.height = undefined;
     }
@@ -653,7 +653,7 @@ export abstract class VirtualRepeatBase<T>
         this.dispatchLayout();
         this.logger.log(
           'onProcessing: layout done rowHeight',
-          this._virtualRepeatContainer._rowHeight
+          this._virtualRepeatContainer.getRowHeight()
         );
       });
     }
@@ -665,6 +665,9 @@ export abstract class VirtualRepeatBase<T>
     let totalAddedHeight = 0;
     let guardHeight = 0;
     let meanHeight = 0;
+
+    if (this._viewContainerRef.length === 0) { return; }
+
     if (this._virtualRepeatContainer._autoHeight) {
       if (this._virtualRepeatContainer._autoHeightVariable) {
         this.logger.log(
@@ -745,17 +748,17 @@ export abstract class VirtualRepeatBase<T>
       meanHeight = totalHeight / this._viewContainerRef.length;
 
       if (!this._virtualRepeatContainer._autoHeightComputed) {
-        this._virtualRepeatContainer._rowHeight = meanHeight;
+        this._virtualRepeatContainer.rowHeight = meanHeight;
         this.logger.log(
           'dispatchLayout: autoHeight rowHeight updated ' + meanHeight
         );
         this._virtualRepeatContainer._autoHeightComputed = true;
         this.requestMeasure.next();
-      } else if (meanHeight !== this._virtualRepeatContainer._rowHeight) {
+      } else if (meanHeight !== this._virtualRepeatContainer.getRowHeight()) {
         this._virtualRepeatContainer._autoHeightVariable = true;
         this.logger.log(
           'dispatchLayout: autoHeightVariable rowHeight updated ' +
-            this._virtualRepeatContainer._rowHeight
+            this._virtualRepeatContainer.getRowHeight()
         );
       }
 
@@ -767,7 +770,7 @@ export abstract class VirtualRepeatBase<T>
           this._virtualRepeatContainer._autoHeightVariableData.totalHeight = totalHeight;
           this._virtualRepeatContainer._autoHeightVariableData.itemsCount = this._viewContainerRef.length;
         }
-        this._virtualRepeatContainer._rowHeight =
+        this._virtualRepeatContainer.rowHeight =
           this._virtualRepeatContainer._autoHeightVariableData.totalHeight /
           this._virtualRepeatContainer._autoHeightVariableData.itemsCount;
 
@@ -799,7 +802,7 @@ export abstract class VirtualRepeatBase<T>
         }
 
         this.logger.log(`dispatchLayout: _autoHeightVariable rowHeight:${
-          this._virtualRepeatContainer._rowHeight
+          this._virtualRepeatContainer.getRowHeight()
         }
                          scrollY: ${this._scrollY} scrollState: ${
           this._virtualRepeatContainer.currentScrollState

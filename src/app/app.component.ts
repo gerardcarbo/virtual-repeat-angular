@@ -19,6 +19,7 @@ import { environment } from '../environments/environment';
 export class AppComponent implements OnInit {
   config = {
     showArray: true,
+    showArrayImages: true,
     tableViewArray: false,
     showAsynch: true,
     tableViewAsynch: false,
@@ -54,7 +55,7 @@ export class AppComponent implements OnInit {
       this.collection = MOCK_DATA;
     }, 100);
 
-    //capture processing$ notifications to display loading progress (only in reactive for demo purposes)
+    // capture processing$ notifications to display loading progress (only in reactive for demo purposes)
     this.tableViewReactive.valueChanges.subscribe((viewTable: boolean) => {
       if (viewTable) {
         setTimeout(() => {

@@ -8,24 +8,26 @@ export class LoggerService {
     if (filterLog) {
       filterLogTerms = filterLog.split(';').map(term => term.trim().toLowerCase()).filter(term => !!term);
     }
-    if (isDevMode() || forceLog) {
-      if (filterLog) {
-        this.log = function (text: string, ...args: any[]) {
-          let done = false;
-          filterLogTerms.forEach(term => {
-            if (!done && text.toLowerCase().indexOf(term) !== -1) {
-              console.log(text, ...args);
-              done = true;
-            }
-          });
-          return;
-        };
-      } else {
-        this.log = function (text: string, ...args: any[]) {
-          console.log(text, ...args);
-        };
+    setTimeout(() => { // hack to be able to use isDevMode()
+      if (isDevMode() || forceLog) {
+        if (filterLog) {
+          this.log = function (text: string, ...args: any[]) {
+            let done = false;
+            filterLogTerms.forEach(term => {
+              if (!done && text.toLowerCase().indexOf(term) !== -1) {
+                console.log(text, ...args);
+                done = true;
+              }
+            });
+            return;
+          };
+        } else {
+          this.log = function (text: string, ...args: any[]) {
+            console.log(text, ...args);
+          };
+        }
       }
-    }
+    }, 100);
   }
 
   log(text: string, ...args: any[]) { }

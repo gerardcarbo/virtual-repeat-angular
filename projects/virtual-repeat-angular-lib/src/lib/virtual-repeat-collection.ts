@@ -168,7 +168,7 @@ export class VirtualRepeat<T> extends VirtualRepeatBase<T>
         : this._collection.length;
     this._isInMeasure = true;
     this._virtualRepeatContainer.holderHeight =
-      this._virtualRepeatContainer._rowHeight * this._collectionLength;
+      this._virtualRepeatContainer.getRowHeight() * this._collectionLength;
     this._isInMeasure = false;
     this.requestLayout.next();
     this.logger.log('measure: exit');

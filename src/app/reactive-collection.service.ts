@@ -4,6 +4,7 @@ import { Subject, of, BehaviorSubject, Subscription, Observable, ReplaySubject }
 import { flatMap, map, distinct, filter, throttleTime, distinctUntilChanged, catchError, share } from 'rxjs/operators';
 import { LoggerService } from 'virtual-repeat-angular/logger.service';
 import { IReactiveCollectionFactory, IReactiveCollection } from 'virtual-repeat-angular/virtual-repeat-reactive';
+import { throttleTimeUntilChanged } from 'virtual-repeat-angular/rxjs.operators';
 
 @Injectable({
   providedIn: 'root'
@@ -82,8 +83,8 @@ export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
     );
 
     this.pages$ = this._requestPageSubject.pipe(
-      distinctUntilChanged(),
-      flatMap((page) => {
+      throttleTimeUntilChanged(1000),
+      flatMap((page: number) => {
         this.logger.log('requestPageSubject: getPage ' + page);
         return this.remoteService.getPage(page).pipe(
           map((items: any[]) => {

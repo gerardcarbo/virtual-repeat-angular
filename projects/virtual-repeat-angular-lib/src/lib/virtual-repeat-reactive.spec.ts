@@ -1,26 +1,26 @@
 import { CommonModule } from '@angular/common';
 import { TestBed, inject } from '@angular/core/testing';
 
-import { VirtualRepeatReactive } from '@app/shared/grid/virtual-repeat/virtual-repeat-reactive';
 import { IterableDiffers, TemplateRef, ViewContainerRef } from '@angular/core';
-import { VirtualRepeatContainer } from '@app/shared/grid/virtual-repeat/virtual-repeat-container';
-import { VirtualRepeatRow } from '@app/shared/grid/virtual-repeat/virtual-repeat.base';
-import { LoggerService } from '@app/shared/grid/virtual-repeat/logger.service';
+import { VirtualRepeatReactive } from './virtual-repeat-reactive';
+import { VirtualRepeatContainer } from './virtual-repeat-container';
+import { VirtualRepeatRow } from './virtual-repeat.base';
+import { LoggerService } from './logger.service';
 
-describe('VirtualRepeat', () => {
+describe('VirtualRepeatReactive', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         CommonModule
       ],
       providers: [
-        VirtualRepeatContainer, TemplateRef, ViewContainerRef
+        VirtualRepeatContainer, TemplateRef, ViewContainerRef, LoggerService
       ]
     });
   });
 
-  it('should create an instance', inject([IterableDiffers, VirtualRepeatContainer, TemplateRef, ViewContainerRef, LoggerService], 
-    (iterableDiffers: IterableDiffers, 
+  it('should create an instance', inject([IterableDiffers, VirtualRepeatContainer, TemplateRef, ViewContainerRef, LoggerService],
+    (iterableDiffers: IterableDiffers,
       virtualRepeatContainer: VirtualRepeatContainer,
       template: TemplateRef<VirtualRepeatRow>,
       viewContainerRef: ViewContainerRef,

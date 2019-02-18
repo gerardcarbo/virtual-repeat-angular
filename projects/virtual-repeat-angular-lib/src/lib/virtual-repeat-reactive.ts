@@ -161,7 +161,7 @@ export class VirtualRepeatReactive<T> extends VirtualRepeatBase<T> implements On
 
     this._isInMeasure = true;
     this._collectionLength = length;
-    this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer._rowHeight * length;
+    this._virtualRepeatContainer.holderHeight = this._virtualRepeatContainer.getRowHeight() * length;
     // calculate a approximate number of which a view can contain
     this._isInMeasure = false;
     this.logger.log('onLength: requestLayout');
@@ -179,7 +179,7 @@ export class VirtualRepeatReactive<T> extends VirtualRepeatBase<T> implements On
       // recover recycled views. Will be filled with new item once received.
       const embedView = <EmbeddedViewRef<VirtualRepeatRow>>view;
       embedView.context.index = index;
-      embedView.rootNodes[0].style.height = this._virtualRepeatContainer._rowHeight + 'px';
+      embedView.rootNodes[0].style.height = this._virtualRepeatContainer.getRowHeight() + 'px';
       embedView.context.$implicit = this.emptyItem(embedView.context.$implicit);
       embedView.context.recycled = true;
       this._viewContainerRef.insert(view, addBefore ? 0 : undefined);
