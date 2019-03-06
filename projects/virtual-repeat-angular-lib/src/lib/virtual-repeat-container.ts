@@ -26,7 +26,7 @@ import {
 } from 'rxjs/operators';
 import { LoggerService } from './logger.service';
 import { IVirtualRepeat } from './virtual-repeat.base';
-import { deglitch } from './rxjs.operators';
+import { deglitch, deglitchFalse } from './rxjs.operators';
 
 export const SCROLL_STOP_TIME_THRESHOLD = 200; // in milliseconds
 
@@ -187,13 +187,13 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
   private _processingSubject = new Subject<boolean>();
   public processingRaw$ = this._processingSubject.pipe(
     tap(state => {
-      console.log('processingRaw$ ' + state);
+      this.logger.log('processingRaw$ ' + state);
     })
   );
   public processing$ = this._processingSubject.pipe(
-    deglitch(200),
+    deglitchFalse(500),
     tap(state => {
-      console.log('processing$ ' + state);
+      this.logger.log('processing$ ' + state);
     })
   );
 

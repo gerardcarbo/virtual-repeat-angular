@@ -1,34 +1,36 @@
-import { isDevMode } from '@angular/core';
+import { noop } from 'rxjs';
 
 export class LoggerService {
+  log: any;
   constructor() {
-    const forceLog = Boolean(localStorage.getItem('gcvra_force_log'));  // force log even in devMode
-    const filterLog = localStorage.getItem('gcvra_filter_log');         // filter log lines (; separated list)
+    const bLog = Boolean(localStorage.getItem('gcvra_log')); // enable log
+    const filterLog = localStorage.getItem('gcvra_log_filter'); // filter log lines (; separated list)
     let filterLogTerms: string[];
     if (filterLog) {
-      filterLogTerms = filterLog.split(';').map(term => term.trim().toLowerCase()).filter(term => !!term);
+      filterLogTerms = filterLog
+        .split(';')
+        .map(term => term.trim().toLowerCase())
+        .filter(term => !!term);
     }
-    setTimeout(() => { // hack to be able to use isDevMode()
-      if (isDevMode() || forceLog) {
-        if (filterLog) {
-          this.log = function (text: string, ...args: any[]) {
-            let done = false;
-            filterLogTerms.forEach(term => {
-              if (!done && text.toLowerCase().indexOf(term) !== -1) {
-                console.log(text, ...args);
-                done = true;
-              }
-            });
-            return;
-          };
-        } else {
-          this.log = function (text: string, ...args: any[]) {
-            console.log(text, ...args);
-          };
-        }
+    if (bLog) {
+      if (filterLog) {
+        this.log = function(text: string, ...args: any[]) {
+          let done = false;
+          filterLogTerms.forEach(term => {
+            if (!done && text.toLowerCase().indexOf(term) !== -1) {
+              console.log(text, ...args);
+              done = true;
+            }
+          });
+          return;
+        };
+      } else {
+        this.log = function(text: string, ...args: any[]) {
+          console.log(text, ...args);
+        };
       }
-    }, 100);
+    } else {
+      this.log = noop;
+    }
   }
-
-  log(text: string, ...args: any[]) { }
 }

@@ -89,3 +89,61 @@ export function deglitch(glitchSize: number) {
     });
   };
 }
+
+/**
+ * Remove spurious falses on a boolean observable.
+ * @param {number} glitchSize max size of the gitches (in miliseconds) to be removed.
+ */
+export function deglitchFalse(glitchSize: number) {
+  return (source: Observable<boolean>) => {
+    return new Observable(observer => {
+      let currentState: boolean;
+      let lastState: boolean;
+      let lastStateTime: number;
+
+      return source
+        .pipe(
+          flatMap((value: boolean) => {
+            // logger.log(`deglitchFalse: value: ${value} currentState: ${currentState} `);
+            lastStateTime = Date.now();
+            lastState = value;
+            if (currentState === undefined || (value === true && currentState !== value)) {
+              currentState = value;
+              return of(value);
+            }
+            if (value === currentState) {
+              return empty();
+            } else {
+              return of(value).pipe(
+                delay(glitchSize),
+                flatMap((value_: boolean) => {
+                  const elapsed = Date.now() - lastStateTime;
+                  // logger.log(`deglitchFalse -> delay elapsed: ${elapsed} value_: ${value_} lastState: ${lastState} currentState: ${currentState} `);
+
+                  if (value_ !== lastState) {
+                    if (lastState === currentState) {
+                      // logger.log(`deglitchFalse -> delay lastState === currentState -> empty()`);
+                      return empty();
+                    } else {
+                      // logger.log(`deglitchFalse -> delay elapsed: ${elapsed} lastState !== currentState -> ${lastState}`);
+                      currentState = lastState;
+                      return of(currentState);
+                    }
+                  }
+                  // logger.log(`deglitchFalse -> delay value_ !== lastState -> ${value_}`);
+                  if (elapsed < glitchSize) {
+                    // logger.log(`deglitchFalse -> delay ${elapsed} < glitchSize -> empty()`);
+                    return empty();
+                  }
+                  currentState = value_;
+                  return of(currentState);
+                })
+              );
+            }
+          })
+        )
+        .subscribe(observer);
+    });
+  };
+}
+

@@ -2,11 +2,14 @@ import { TestBed, inject } from '@angular/core/testing';
 
 import { LoggerService } from './logger.service';
 import { Subject } from 'rxjs';
-import { deglitch, throttleTimeUntilChanged } from './rxjs.operators';
+import {
+  deglitch,
+  throttleTimeUntilChanged,
+  deglitchFalse
+} from './rxjs.operators';
 import { tap } from 'rxjs/operators';
 
 describe('RXJs operators', () => {
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [LoggerService]
@@ -111,7 +114,7 @@ describe('RXJs operators', () => {
   });
 
   describe('deglitch', () => {
-    it('should change simple', function(done) {
+    it('should change simple (0-->1)', function(done) {
       inject([LoggerService], function(logger: LoggerService) {
         let finalState;
         let count = 0;
@@ -321,6 +324,178 @@ describe('RXJs operators', () => {
         setTimeout(() => test.complete(), 850);
       })();
     });
+  });
+
+  describe('deglitchFalse', () => {
+    it('should change simple (0-->1)', function(done) {
+      inject([LoggerService], function(logger: LoggerService) {
+        logger.log('test: should change simple (0-->1)');
+        let finalState;
+        let count = 0;
+        const test = new Subject<boolean>();
+        test
+          .pipe(
+            deglitchFalse(100),
+            tap(state => {
+              logger.log('test: tap: ' + state + ' count: ' + count);
+              finalState = state;
+              if (count === 0) {
+                expect(state).toBe(false);
+              } else {
+                expect(state).toBe(true);
+              }
+              count++;
+            })
+          )
+          .subscribe({
+            complete: () => {
+              expect(finalState).toBe(true);
+              done();
+            }
+          });
+
+        setTimeout(() => test.next(false), 0);
+        setTimeout(() => test.next(true), 500);
+        setTimeout(() => test.complete(), 650);
+      })();
+    });
+
+    it('should NOT deglitch simple true (0-->1->0)', function(done) {
+      inject([LoggerService], function(logger: LoggerService) {
+        logger.log('test: should NOT deglitch simple true (0-->1->0)');
+        let finalState;
+        const test = new Subject<boolean>();
+        let count = 0;
+        test
+          .pipe(
+            deglitchFalse(100),
+            tap(state => {
+              finalState = state;
+              count++;
+              logger.log('test: tap: ' + state + ' count: ' + count);
+            })
+          )
+          .subscribe({
+            complete: () => {
+              expect(count).toBe(3);
+              expect(finalState).toBeFalsy();
+              done();
+            }
+          });
+        setTimeout(() => test.next(false), 0);
+        setTimeout(() => test.next(true), 500);
+        setTimeout(() => test.next(false), 550);
+        setTimeout(() => test.complete(), 650);
+      })();
+    });
+
+    it('should deglitch simple false (1-->0->1)', function(done) {
+      inject([LoggerService], function(logger: LoggerService) {
+        logger.log('test: should deglitch simple false (1-->0->1)');
+        let finalState;
+        const test = new Subject<boolean>();
+        let count = 0;
+        test
+          .pipe(
+            deglitchFalse(100),
+            tap(state => {
+              finalState = state;
+              count++;
+              logger.log('test: tap: ' + state + ' count: ' + count);
+            })
+          )
+          .subscribe({
+            complete: () => {
+              expect(count).toBe(1);
+              expect(finalState).toBe(true);
+              done();
+            }
+          });
+        setTimeout(() => test.next(true), 0);
+        setTimeout(() => test.next(false), 500);
+        setTimeout(() => test.next(true), 550);
+        setTimeout(() => test.complete(), 650);
+      })();
+    });
+
+    it('should deglitch double false (0-->1-->0->1)', function(done) {
+      inject([LoggerService], function(logger: LoggerService) {
+        let finalState;
+        let count = 0;
+        const test = new Subject<boolean>();
+        test
+          .pipe(
+            deglitchFalse(100),
+            tap(state => {
+              logger.log('test: tap: ' + state + ' count: ' + count);
+              finalState = state;
+              if (count === 0) {
+                expect(state).toBe(false);
+              }
+              if (count === 1) {
+                expect(state).toBe(true);
+              }
+              count++;
+            })
+          )
+          .subscribe({
+            complete: () => {
+              expect(count).toBe(2); // 0->1
+              expect(finalState).toBe(true);
+              done();
+            }
+          });
+
+        setTimeout(() => test.next(false), 0);
+        setTimeout(() => test.next(true), 500);
+        setTimeout(() => test.next(false), 650);
+        setTimeout(() => test.next(true), 700);
+        setTimeout(() => test.complete(), 750);
+      })();
+    });
+
+    fit('should NOT deglitch double true (1-->0-->1->0)', function(done) {
+      inject([LoggerService], function(logger: LoggerService) {
+        let finalState;
+        let count = 0;
+        const test = new Subject<boolean>();
+        test
+          .pipe(
+            deglitchFalse(100),
+            tap(state => {
+              logger.log('test: tap: ' + state + ' count: ' + count);
+              finalState = state;
+              if (count === 0) {
+                expect(state).toBe(true);
+              }
+              if (count === 1) {
+                expect(state).toBe(false);
+              }
+              if (count === 2) {
+                expect(state).toBe(true);
+              }
+              if (count === 3) {
+                expect(state).toBe(false);
+              }
+              count++;
+            })
+          )
+          .subscribe({
+            complete: () => {
+              expect(count).toBe(4); // 1->0->1->0
+              expect(finalState).toBe(false);
+              done();
+            }
+          });
+
+        setTimeout(() => test.next(true), 0);
+        setTimeout(() => test.next(false), 500);
+        setTimeout(() => test.next(true), 650);
+        setTimeout(() => test.next(false), 700);
+        setTimeout(() => test.complete(), 750);
+      })();
+    });
+
   });
 });
 
