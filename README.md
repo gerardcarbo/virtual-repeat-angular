@@ -80,7 +80,7 @@ The *connect / disconnect* methods will be called by the virtual repeat library.
 
 ## Notes
 
-* ```<gc-virtual-repeat-container>``` must be inserted inside an element with display: block and height: 100% to perform properly.
+* ```<gc-virtual-repeat-container>``` must be inserted inside an element with display: flex & flex: 1 to perform properly.
 * Inside the container you can place any kind of HTML element that is full row, as shown in the demo using table's ```<tr>```.
 
 # Demo
