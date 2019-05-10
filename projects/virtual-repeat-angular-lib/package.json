@@ -1,6 +1,6 @@
 {
   "name": "virtual-repeat-angular",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "author": {
     "name": "Gerard Carbó"
   },
@@ -8,5 +8,16 @@
   "peerDependencies": {
     "@angular/common": ">=5 <=7",
     "@angular/core": ">=5 <=7"
-  }
+  },
+  "keywords": [
+    "ngx",
+    "angular2",
+    "virtual scroll",
+    "virtual repeat",
+    "infinite list",
+    "infinite scroll",
+    "variable height",
+    "reactive",
+    "async"
+    ]
 }

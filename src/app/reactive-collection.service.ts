@@ -88,8 +88,9 @@ export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
         this.logger.log('requestPageSubject: getPage ' + page);
         return this.remoteService.getPage(page).pipe(
           map((items: any[]) => {
-            // check if already received
+            // check if already received and add to _collection
             this.logger.log('requestPageSubject: filling page ' + page);
+
             // fill sparse collection
             items.forEach((item, i) => {
               const index = (page * this._itemsPerPage) + i;

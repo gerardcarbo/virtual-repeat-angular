@@ -66,7 +66,7 @@ export interface IReactiveCollection<T> {
 
 For each call to *requestLength()* the observable *length$* must emit the collection's length. 
 
-For each call to *requestItem()* the observable *requestItem$* must emit the collection's item at the 'index' position (zero based). 
+For each call to *requestItem()* the observable *requestItem$* must emit the collection's *item* at the *index* position (zero based). 
 
 For each call to *reset()* the collection must clean its internal state and the observable *reset$* must emit some boolean (its value is not used). The virtual repeat library will request the data again. 
 
@@ -93,4 +93,4 @@ See <a href="https://gerardcarbo.github.io/virtual-repeat-angular/" target="_bla
 
 # Acknowledgements
 
-Derived from previous work of <a href="https://nya.io/uncategorized/make-a-list-view-in-angular/">Bob Yuan</a> but using a offsetter div instead of absolute item positioning. Revamped also to support asynch and reactive collections, and variable height rows.
+Derived from previous work of <a href="https://nya.io/uncategorized/make-a-list-view-in-angular/">Bob Yuan</a> but using an offsetter div instead of absolute item positioning. Revamped also to support asynch and reactive collections, and variable height rows.

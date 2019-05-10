@@ -6,7 +6,7 @@ const logger = new LoggerService();
 
 /**
  * If observable value has not changed act as throttleTime, but if changed notify it inmediatly.
- * @param {number} throttleTime throttle time in miliseconds.
+ * @param throttleTime throttle time in miliseconds.
  */
 export function throttleTimeUntilChanged(throttleTime: number) {
   return (source: Observable<any>) => {
@@ -35,7 +35,7 @@ export function throttleTimeUntilChanged(throttleTime: number) {
 
 /**
  * Remove spurious changes on a boolean observable.
- * @param {number} glitchSize max size of the gitches (in miliseconds) to be removed.
+ * @param glitchSize max size of the gitches (in miliseconds) to be removed.
  */
 export function deglitch(glitchSize: number) {
   return (source: Observable<boolean>) => {
@@ -92,7 +92,7 @@ export function deglitch(glitchSize: number) {
 
 /**
  * Remove spurious falses on a boolean observable.
- * @param {number} glitchSize max size of the gitches (in miliseconds) to be removed.
+ * @param glitchSize max size of the gitches (in miliseconds) to be removed.
  */
 export function deglitchFalse(glitchSize: number) {
   return (source: Observable<boolean>) => {
