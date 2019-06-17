@@ -21,12 +21,10 @@ import {
   map,
   debounceTime,
   pairwise,
-  throttleTime,
-  delay
 } from 'rxjs/operators';
 import { LoggerService } from './logger.service';
 import { IVirtualRepeat } from './virtual-repeat.base';
-import { deglitch, deglitchFalse } from './rxjs.operators';
+import { deglitchFalse } from './rxjs.operators';
 
 export const SCROLL_STOP_TIME_THRESHOLD = 200; // in milliseconds
 
@@ -168,7 +166,7 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
 
   private _currentScrollState: SCROLL_STATE = SCROLL_STATE.IDLE;
 
-  @ViewChild('listContainer') listContainer: ElementRef;
+  @ViewChild('listContainer', {static: true} )  listContainer: ElementRef;
 
   scrollbarStyle: string;
   scrollbarWidth: number;

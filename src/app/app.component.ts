@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AsynchCollectionService } from './asynch-collection.service';
 import {
   ReactiveCollectionFactory,
@@ -29,9 +29,9 @@ export class AppComponent implements OnInit {
     showReactiveImages: true
   };
 
-  @ViewChild('reactiveVirtualRepeatContainerList')
+  @ViewChild('reactiveVirtualRepeatContainerList', {static: true})
   reactiveVirtualRepeatContainerList: VirtualRepeatContainer;
-  @ViewChild('reactiveVirtualRepeatContainerTable')
+  @ViewChild('reactiveVirtualRepeatContainerTable', {static: true})
   reactiveVirtualRepeatContainerTable: VirtualRepeatContainer;
 
   tableViewReactive = new FormControl('');

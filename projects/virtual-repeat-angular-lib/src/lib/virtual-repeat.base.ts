@@ -362,7 +362,7 @@ export abstract class VirtualRepeatBase<T>
         this._collectionLength *
           (this._scrollY / this._virtualRepeatContainer.holderHeight)
       );
-      const lastPosition =
+      let lastPosition =
         Math.ceil(
           this._containerHeight / this._virtualRepeatContainer.getRowHeight()
         ) + firstPosition;
@@ -390,7 +390,7 @@ export abstract class VirtualRepeatBase<T>
       );
       const firstPositionOffset =
         this._scrollY - firstPosition * this._virtualRepeatContainer.getRowHeight();
-      const lastPosition =
+      let lastPosition =
         Math.ceil(
           (this._containerHeight + firstPositionOffset) /
             this._virtualRepeatContainer.getRowHeight()
