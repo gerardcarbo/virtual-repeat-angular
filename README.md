@@ -91,6 +91,10 @@ See <a href="https://gerardcarbo.github.io/virtual-repeat-angular/" target="_bla
 
 <a href="/LICENSE">MIT</a>
 
+# Releases
+
+<a href="https://github.com/gerardcarbo/virtual-repeat-angular/releases" target="_blank">GitHub Releases Page</a>
+
 # Acknowledgements
 
 Derived from previous work of <a href="https://nya.io/uncategorized/make-a-list-view-in-angular/">Bob Yuan</a> but using an offsetter div instead of absolute item positioning. Revamped also to support asynch and reactive collections, and variable height rows.

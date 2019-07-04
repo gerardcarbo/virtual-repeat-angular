@@ -58,7 +58,8 @@ export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
       map(() => {
         this.logger.log('requestLengthSubject: enter');
         return this.remoteService.getCount();
-      })
+      }),
+      share() // important -> make it multicast
     );
 
     this.items$ = this._requestItemSubject.pipe(
@@ -80,6 +81,7 @@ export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
         this.logger.log('items$: exception', error);
         return caught;
       }),
+      share() // important -> make it multicast
     );
 
     this.pages$ = this._requestPageSubject.pipe(
@@ -108,7 +110,8 @@ export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
               }
             });
             return page;
-          })
+          }),
+          share() // important -> make it multicast
         );
       })
     );

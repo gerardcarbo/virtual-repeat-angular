@@ -24,7 +24,7 @@
         <label *ngIf="config.showAsynch" style="float: right">
           <input type="checkbox" name="showArrayImages" [(ngModel)]="config.showArrayImages" (change)="onChange()">Images</label>
         <label style="float: right" *ngIf="config.showArray">
-          <input type="checkbox" name="tableViewArray" [(ngModel)]="config.tableViewArray" (change)="onChange()">Table View</label>
+          <input type="checkbox" name="tableViewArray" [(ngModel)]="config.tableViewArray" (change)="onChange()">Table View (variable height) </label>
       </h2>
       <div class="display_flex flex box-shadow" *ngIf="config.showArray">
         <div class="expand" *ngIf="!config.tableViewArray">
@@ -73,7 +73,7 @@
         <label *ngIf="config.showAsynch" style="float: right">
           <input type="checkbox" name="showAsynchImages" [(ngModel)]="config.showAsynchImages" (change)="onChange()">Images</label>
         <label style="float: right" *ngIf="config.showAsynch">
-          <input type="checkbox" name="tableViewAsynch" [(ngModel)]="config.tableViewAsynch" (change)="onChange()">Table View</label>
+          <input type="checkbox" name="tableViewAsynch" [(ngModel)]="config.tableViewAsynch" (change)="onChange()">Table View (variable height) </label>
       </h2>
       <div class="display_flex flex box-shadow" *ngIf="config.showAsynch">
         <div class="expand" *ngIf="!config.tableViewAsynch">
@@ -122,7 +122,7 @@
         <label *ngIf="config.showReactive" style="float: right">
           <input type="checkbox" name="showReactiveImages" [(ngModel)]="config.showReactiveImages" (change)="onChange()">Images</label>
         <label style="float: right" *ngIf="config.showReactive">
-          <input type="checkbox" [formControl]="tableViewReactive" [(ngModel)]="config.tableViewReactive" (change)="onChange()">Table View</label>
+          <input type="checkbox" [formControl]="tableViewReactive" [(ngModel)]="config.tableViewReactive" (change)="onChange()">Table View (variable height)</label>
       </h2>
       <div class="display_flex flex vbox box-shadow" *ngIf="config.showReactive">
         <div class="expand" *ngIf="!config.tableViewReactive">
