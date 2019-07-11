@@ -92,7 +92,7 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
    * current scroll position.
    */
   @Output()
-  get scrollPosition(): Observable<number> {
+  get scrollPosition$(): Observable<number> {
     return this._scrollPosition.asObservable();
   }
 
@@ -126,7 +126,7 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
   }
 
   @Input()
-  set newScrollPosition(p: number) {
+  set scrollPosition(p: number) {
     // this.logger.log('p', p);
     this.listContainer.nativeElement.scrollTop = p;
     // if list-holder has no height at the certain time. scrollTop will not be set.
@@ -230,7 +230,7 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
     );
 
     this._subscription.add(
-      this.scrollPosition
+      this.scrollPosition$
         .pipe(
           tap(() => {
             if (this._currentScrollState === SCROLL_STATE.IDLE) {
@@ -286,7 +286,7 @@ export class VirtualRepeatContainer implements AfterViewInit, OnDestroy {
   }
 
   reset() {
-    this.newScrollPosition = 0;
+    this.scrollPosition = 0;
     this._virtualRepeat.reset();
   }
 

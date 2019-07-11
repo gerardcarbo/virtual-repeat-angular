@@ -29,25 +29,29 @@ export class AppComponent implements OnInit {
     showReactiveImages: true
   };
 
-  @ViewChild('reactiveVirtualRepeatContainerList', {static: true})
+  @ViewChild('reactiveVirtualRepeatContainerList', { static: false })
   reactiveVirtualRepeatContainerList: VirtualRepeatContainer;
-  @ViewChild('reactiveVirtualRepeatContainerTable', {static: true})
+  @ViewChild('reactiveVirtualRepeatContainerTable', { static: false })
   reactiveVirtualRepeatContainerTable: VirtualRepeatContainer;
+
+  currentReactiveVirtualRepeatContainer: VirtualRepeatContainer;
 
   tableViewReactive = new FormControl('');
 
   collection: { id: number; image: string; content: string }[] = [];
-  public processing = false;
 
+  public processing = false;
   public version: string = environment.VERSION;
+  public reactivePosition: number;
+  public reactivePositionGoto: number;
 
   constructor(
     public asynchCollection: AsynchCollectionService<any>,
-    public reactiveCollectionFactory: ReactiveCollectionFactory<any>,
     public reactiveCollection: ReactiveCollectionService<any>
   ) {
     this.config =
       JSON.parse(localStorage.getItem('AppComponentConfig')) || this.config;
+    this.reactiveCollection.connect();
   }
 
   ngOnInit(): void {
@@ -58,30 +62,44 @@ export class AppComponent implements OnInit {
     // capture processing$ notifications to display loading progress (only in reactive for demo purposes)
     this.tableViewReactive.valueChanges.subscribe((viewTable: boolean) => {
       if (viewTable) {
+        this.reactiveCollection.reset();
         setTimeout(() => {
           if (this.reactiveVirtualRepeatContainerTable) {
-            this.reactiveVirtualRepeatContainerTable.processing$.subscribe(
-              (processing: boolean) => {
-                this.processing = processing;
-              }
-            );
+            this.currentReactiveVirtualRepeatContainer = this.reactiveVirtualRepeatContainerTable;
+            this.subscribeToReactiveData();
           }
         }, 100);
       } else {
+        this.reactiveCollection.reset();
         setTimeout(() => {
           if (this.reactiveVirtualRepeatContainerList) {
-            this.reactiveVirtualRepeatContainerList.processing$.subscribe(
-              (processing: boolean) => {
-                this.processing = processing;
-              }
-            );
+            this.currentReactiveVirtualRepeatContainer = this.reactiveVirtualRepeatContainerList;
+            this.subscribeToReactiveData();
           }
         }, 100);
       }
     });
   }
 
+  private subscribeToReactiveData() {
+    this.currentReactiveVirtualRepeatContainer.processing$.subscribe((processing: boolean) => {
+      this.processing = processing;
+    });
+    this.currentReactiveVirtualRepeatContainer.scrollPosition$.subscribe((position: number) => {
+      this.reactivePosition = Math.round(position / this.currentReactiveVirtualRepeatContainer.getRowHeight());
+    });
+  }
+
   onChange() {
     localStorage.setItem('AppComponentConfig', JSON.stringify(this.config));
+  }
+
+  resetReactive() {
+    this.reactiveCollection.reset();
+  }
+
+  gotoReactivePosition() {
+    this.currentReactiveVirtualRepeatContainer.scrollPosition =
+      this.reactivePositionGoto * this.currentReactiveVirtualRepeatContainer.getRowHeight();
   }
 }
