@@ -1,6 +1,6 @@
 {
   "name": "virtual-repeat-angular-lib-app",
-  "version": "0.4.9",
+  "version": "0.4.10",
   "scripts": {
     "serve": "ng serve",
     "build_prod": "ng build --prod",
@@ -11,8 +11,8 @@
     "build_lib": "ng build --prod virtual-repeat-angular-lib",
     "npm_pack": "cp README.md dist/virtual-repeat-angular-lib && cd dist/virtual-repeat-angular-lib && npm pack && cp *.tgz ../releases/",
     "npm_build_and_package": "npm run build_lib && npm run npm_pack",
-    "npm_publish": "npm publish dist/virtual-repeat-angular-lib/virtual-repeat-angular-0.4.9.tgz",
-    "ngh_publish": "npm run build_lib && ng build --prod --base-href https://gerardcarbo.github.io/virtual-repeat-angular/ && ngh --dir dist/virtual-repeat-angular-lib-app",
+    "npm_publish": "npm publish dist/virtual-repeat-angular-lib/virtual-repeat-angular-0.4.10.tgz",
+    "ngh_publish": "ng build --prod --base-href https://gerardcarbo.github.io/virtual-repeat-angular/ && ngh --dir dist/virtual-repeat-angular-lib-app",
     "git_push": "git push origin master",
     "git_push_force": "git push -f origin master",
     "git_ammend": "git commit --amend --all --no-edit",

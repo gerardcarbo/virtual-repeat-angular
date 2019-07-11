@@ -37,7 +37,7 @@ export class VirtualRepeatRow {
     public $implicit: any,
     public index: number,
     public count: number
-  ) {}
+  ) { }
 
   get first(): boolean {
     return this.index === 0;
@@ -168,7 +168,7 @@ export abstract class VirtualRepeatBase<T>
     filter(() => {
       this.logger.log(
         `requestMeasureFiltered: enter isInMeasure: ` +
-          `${this._isInMeasure} isInLayout: ${this._isInLayout}`
+        `${this._isInMeasure} isInLayout: ${this._isInLayout}`
       );
       if (this._isInMeasure || this._isInLayout) {
         this.logger.log('requestMeasureFiltered: retrying...');
@@ -188,7 +188,7 @@ export abstract class VirtualRepeatBase<T>
     filter(() => {
       this.logger.log(
         `requestLayoutFiltered: enter isInMeasure: ${
-          this._isInMeasure
+        this._isInMeasure
         } isInLayout: ${this._isInLayout}`
       );
       if (this._isInMeasure || this._isInLayout) {
@@ -238,14 +238,14 @@ export abstract class VirtualRepeatBase<T>
     );
 
     this._subscription.add(
-      this._virtualRepeatContainer.scrollPosition
+      this._virtualRepeatContainer.scrollPosition$
         .pipe(
           debounceTime(60),
           filter(scrollY => {
             return (
               scrollY === 0 ||
               Math.abs(scrollY - this._scrollY) >=
-                (this._virtualRepeatContainer.getRowHeight() * this._guardItems) / 2
+              (this._virtualRepeatContainer.getRowHeight() * this._guardItems) / 2
             );
           })
         )
@@ -282,6 +282,7 @@ export abstract class VirtualRepeatBase<T>
   }
 
   public reset() {
+    this._virtualRepeatContainer.scrollPosition = 0;
     this._collectionLength = -1;
     this.detachAllViews();
     this.requestMeasure.next();
@@ -350,7 +351,7 @@ export abstract class VirtualRepeatBase<T>
     this._lastItemIndex = this._lastRequestedItemIndex;
     this.logger.log(
       `findRequestedIndexesRange: _autoHeightVariable: ${
-        this._virtualRepeatContainer._autoHeightVariable
+      this._virtualRepeatContainer._autoHeightVariable
       } firstItemPosition: ${this._firstItemIndex}`
     );
 
@@ -360,7 +361,7 @@ export abstract class VirtualRepeatBase<T>
 
       firstPosition = Math.floor(
         this._collectionLength *
-          (this._scrollY / this._virtualRepeatContainer.holderHeight)
+        (this._scrollY / this._virtualRepeatContainer.holderHeight)
       );
       let lastPosition =
         Math.ceil(
@@ -375,13 +376,12 @@ export abstract class VirtualRepeatBase<T>
         this._collectionLength - 1
       );
       this.logger.log(
-        `findRequestedIndexesRange: _autoHeightVariable scrollY: ${
-          this._scrollY
-        } holderHeight: ${this._virtualRepeatContainer.holderHeight}`
+        `findRequestedIndexesRange: _autoHeightVariable scrollY: 
+        ${this._scrollY} holderHeight: ${this._virtualRepeatContainer.holderHeight}`
       );
       this.logger.log(
         `findRequestedIndexesRange: _autoHeightVariable firstRequestedItemPosition: ${
-          this._firstRequestedItemIndex
+        this._firstRequestedItemIndex
         } lastRequestedItemPosition: ${this._lastRequestedItemIndex}`
       );
     } else {
@@ -393,7 +393,7 @@ export abstract class VirtualRepeatBase<T>
       let lastPosition =
         Math.ceil(
           (this._containerHeight + firstPositionOffset) /
-            this._virtualRepeatContainer.getRowHeight()
+          this._virtualRepeatContainer.getRowHeight()
         ) + firstPosition;
       this._firstRequestedItemIndex = Math.max(
         firstPosition - this._guardItems,
@@ -411,12 +411,12 @@ export abstract class VirtualRepeatBase<T>
         this._firstRequestedItemIndex * this._virtualRepeatContainer.getRowHeight();
       this.logger.log(
         `findRequestedIndexesRange: translateY: ${
-          this._virtualRepeatContainer.translateY
+        this._virtualRepeatContainer.translateY
         } rowHeight: ${this._virtualRepeatContainer.getRowHeight()}`
       );
       this.logger.log(
         `findRequestedIndexesRange: firstRequestedItemPosition: ${
-          this._firstRequestedItemIndex
+        this._firstRequestedItemIndex
         } lastRequestedItemPosition: ${this._lastRequestedItemIndex}`
       );
     }
@@ -465,12 +465,12 @@ export abstract class VirtualRepeatBase<T>
       this._fullScroll = false;
       this.logger.log(
         `createViews: length > 0, _firstItemPosition: ${
-          this._firstItemIndex
+        this._firstItemIndex
         } _lastItemPosition: ${this._lastItemIndex}`
       );
       this.logger.log(
         `createViews: length > 0, _firstRequestedItemPosition: ${
-          this._firstRequestedItemIndex
+        this._firstRequestedItemIndex
         } _lastRequestedItemPosition: ${this._lastRequestedItemIndex}`
       );
       for (
@@ -524,9 +524,9 @@ export abstract class VirtualRepeatBase<T>
   protected createViewForItem(index: number, item: T): ViewRef {
     this.logger.log(
       `createViewForItem: _firstItemPosition: ${
-        this._firstItemIndex
+      this._firstItemIndex
       } _firstRequestedItemPosition: ${this._firstRequestedItemIndex} length: ${
-        this._viewContainerRef.length
+      this._viewContainerRef.length
       }`
     );
     let containerPos = index - (this._firstItemIndex || 0);
@@ -638,7 +638,7 @@ export abstract class VirtualRepeatBase<T>
       viewContent.style.display = 'none'; // will be shown when processing finished
       this.logger.log(
         `applyStyles: _autoHeightVariable creaded view on ${index} recycled: ${
-          view.context.recycled
+        view.context.recycled
         }`
       );
     }
@@ -672,7 +672,7 @@ export abstract class VirtualRepeatBase<T>
       if (this._virtualRepeatContainer._autoHeightVariable) {
         this.logger.log(
           `dispatchLayout: _autoHeightVariable enter ${
-            this._viewContainerRef.length
+          this._viewContainerRef.length
           }`
         );
         // show / recycle views in _autoHeightVariable mode
@@ -689,7 +689,7 @@ export abstract class VirtualRepeatBase<T>
             viewElement.style.display = view.context.previousDisplay;
             this.logger.log(
               `dispatchLayout: _autoHeightVariable showing ${
-                view.context.index
+              view.context.index
               }`
             );
           }
@@ -699,7 +699,7 @@ export abstract class VirtualRepeatBase<T>
             this._viewContainerRef.detach(containerIndex);
             this.logger.log(
               `dispatchLayout: _autoHeightVariable removing ${
-                view.context.index
+              view.context.index
               } recycler lenght: ${this._recycler.length()}`
             );
             containerIndex--;
@@ -758,7 +758,7 @@ export abstract class VirtualRepeatBase<T>
         this._virtualRepeatContainer._autoHeightVariable = true;
         this.logger.log(
           'dispatchLayout: autoHeightVariable rowHeight updated ' +
-            this._virtualRepeatContainer.getRowHeight()
+          this._virtualRepeatContainer.getRowHeight()
         );
       }
 
@@ -782,7 +782,7 @@ export abstract class VirtualRepeatBase<T>
           let translateY =
             this._virtualRepeatContainer.translateY +
             (this._virtualRepeatContainer.currentScrollState ===
-            SCROLL_STATE.SCROLLING_DOWN
+              SCROLL_STATE.SCROLLING_DOWN
               ? totalRemovedHeight
               : -totalAddedHeight);
           // check out of scroll
@@ -801,16 +801,10 @@ export abstract class VirtualRepeatBase<T>
           this._virtualRepeatContainer.translateY = 0;
         }
 
-        this.logger.log(`dispatchLayout: _autoHeightVariable rowHeight:${
-          this._virtualRepeatContainer.getRowHeight()
-        }
-                         scrollY: ${this._scrollY} scrollState: ${
-          this._virtualRepeatContainer.currentScrollState
-        }
+        this.logger.log(`dispatchLayout: _autoHeightVariable rowHeight: ${this._virtualRepeatContainer.getRowHeight()}
+                         scrollY: ${this._scrollY} scrollState: ${this._virtualRepeatContainer.currentScrollState}
                          totalRemovedHeight: ${totalRemovedHeight} totalAddedHeight: ${totalAddedHeight}
-                         translateY: ${
-                           this._virtualRepeatContainer.translateY
-                         }`);
+                         translateY: ${this._virtualRepeatContainer.translateY}`);
       }
     }
   }

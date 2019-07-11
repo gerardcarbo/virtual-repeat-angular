@@ -123,11 +123,15 @@
           <input type="checkbox" name="showReactiveImages" [(ngModel)]="config.showReactiveImages" (change)="onChange()">Images</label>
         <label style="float: right" *ngIf="config.showReactive">
           <input type="checkbox" [formControl]="tableViewReactive" [(ngModel)]="config.tableViewReactive" (change)="onChange()">Table View (variable height)</label>
+          Current Item: <input type="number" readonly style="max-width: 50px" [ngModel]="reactivePosition">
+          Go to Item: <input type="number" style="max-width: 50px" [(ngModel)]="reactivePositionGoto" (change)="gotoReactivePosition()">
+          &nbsp;<input type="button" (click)="resetReactive()" value="reset">
+
       </h2>
       <div class="display_flex flex vbox box-shadow" *ngIf="config.showReactive">
         <div class="expand" *ngIf="!config.tableViewReactive">
           <gc-virtual-repeat-container rowHeight="auto" #reactiveVirtualRepeatContainerList>
-            <list-item-example *virtualRepeatReactive="let row of reactiveCollectionFactory; let i = index" [item]="row" [index]="i" [showImage]="config.showReactiveImages">
+            <list-item-example *virtualRepeatReactive="let row of reactiveCollection; let i = index" [item]="row" [index]="i" [showImage]="config.showReactiveImages">
             </list-item-example>
           </gc-virtual-repeat-container>
         </div>
@@ -144,7 +148,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *virtualRepeatReactive="let row of reactiveCollectionFactory; let i = index">
+                <tr *virtualRepeatReactive="let row of reactiveCollection; let i = index">
                   <td *ngIf="config.showReactiveImages" style="width:10%">
                     <img src='{{row.thumbnailUrl}}' height="48px">
                   </td>
