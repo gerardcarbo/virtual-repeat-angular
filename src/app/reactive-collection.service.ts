@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RemoteService } from './remote.service';
 import { Subject, of, BehaviorSubject, Subscription, Observable, ReplaySubject } from 'rxjs';
-import { flatMap, map, distinct, filter, throttleTime, distinctUntilChanged, catchError, share } from 'rxjs/operators';
+import { flatMap, map, filter, catchError, share, takeUntil } from 'rxjs/operators';
 import { LoggerService } from 'virtual-repeat-angular/logger.service';
 import { IReactiveCollectionFactory, IReactiveCollection } from 'virtual-repeat-angular/virtual-repeat-reactive';
 import { throttleTimeUntilChanged } from 'virtual-repeat-angular/rxjs.operators';
@@ -30,7 +30,7 @@ export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
 
   private _requestLengthSubject: BehaviorSubject<void>;
   private _requestItemSubject: ReplaySubject<number>;
-  private _requestPageSubject: Subject<any> ;
+  private _requestPageSubject: Subject<any>;
 
   private _requestedItems: {} = {};
 
@@ -111,13 +111,18 @@ export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
             });
             return page;
           }),
-          share() // important -> make it multicast
+          takeUntil(this.reset$)
         );
-      })
+      }),
+      share()
     );
 
     this._subscription = this.pages$.subscribe((page) => { // subscription needed to activate observer.
       this.logger.log('pages$: requested', page);
+    });
+
+    this._subscription = this.reset$.subscribe(() => { // subscription needed to activate observer.
+      this.logger.log('reset$: event');
     });
 
     this._connected = true;
