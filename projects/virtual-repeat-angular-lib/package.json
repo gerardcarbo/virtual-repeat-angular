@@ -1,13 +1,13 @@
 {
   "name": "virtual-repeat-angular",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "author": {
     "name": "Gerard Carbó"
   },
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": ">=5 <=8",
-    "@angular/core": ">=5 <=8"
+    "@angular/common": ">=5 <=9",
+    "@angular/core": ">=5 <=9"
   },
   "keywords": [
     "ngx",
