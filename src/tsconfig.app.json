@@ -5,8 +5,8 @@
     "types": [ "node" ],
     "typeRoots": [ "../node_modules/@types" ]
   },
-  "exclude": [
-    "src/test.ts",
-    "**/*.spec.ts"
+  "files": [
+    "main.ts",
+    "polyfills.ts"
   ]
 }

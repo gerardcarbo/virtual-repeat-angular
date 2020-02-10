@@ -29,9 +29,9 @@ export class AppComponent implements OnInit {
     showReactiveImages: true
   };
 
-  @ViewChild('reactiveVirtualRepeatContainerList', { static: false })
+  @ViewChild('reactiveVirtualRepeatContainerList')
   reactiveVirtualRepeatContainerList: VirtualRepeatContainer;
-  @ViewChild('reactiveVirtualRepeatContainerTable', { static: false })
+  @ViewChild('reactiveVirtualRepeatContainerTable')
   reactiveVirtualRepeatContainerTable: VirtualRepeatContainer;
 
   currentReactiveVirtualRepeatContainer: VirtualRepeatContainer;
