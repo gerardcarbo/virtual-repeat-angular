@@ -1,7 +1,6 @@
 import { Component, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { VirtualRepeatContainer, SCROLL_STATE } from 'virtual-repeat-angular/virtual-repeat-container';
-// import {VirtualRepeatContainer, SCROLL_STATE} from 'virtual-repeat-angular';
 
 @Component({
     // tslint:disable-next-line:component-selector

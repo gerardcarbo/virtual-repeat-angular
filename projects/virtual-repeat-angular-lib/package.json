@@ -6,8 +6,11 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "@angular/common": ">=5 <=9",
-    "@angular/core": ">=5 <=9"
+    "@angular/common": ">=5",
+    "@angular/core": ">=5"
+  },
+  "dependencies": {
+    "tslib": "^2.0.0"
   },
   "keywords": [
     "ngx",
