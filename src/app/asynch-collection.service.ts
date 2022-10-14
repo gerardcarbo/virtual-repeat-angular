@@ -9,11 +9,21 @@ import { LoggerService } from 'virtual-repeat-angular/logger.service';
 @Injectable({
   providedIn: 'root'
 })
-export class AsynchCollectionService<T> implements IAsynchCollection<T> {
+export class AsynchCollectionService<T> implements IAsynchCollection<T>, Iterable<T>, Iterator<T> {
 
   private _itemsPerPage = 10;
   private _collection = [];
   private _lenghtPromise: Promise<number>;
+
+  //disable error TS2322: Type 'ReactiveCollectionService<any>' is not assignable to type 'NgIterable<any>'
+  [Symbol.iterator](): Iterator<T>
+  {
+    return <Iterator<T>>this;
+  }
+  next(...args: [] | [T]): IteratorResult<T, T>
+  {
+    return null;
+  }
 
   constructor(private remoteService: RemoteService, private logger:LoggerService) {
     this._lenghtPromise = Promise.resolve(this.remoteService.getCount());

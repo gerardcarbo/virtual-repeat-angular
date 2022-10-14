@@ -39,12 +39,29 @@ export interface IReactiveCollection<T> {
   requestItem(index: number): void;
 }
 
+interface ForDirectiveContext<T> {
+  $implicit: T;
+  index: number;
+  first: boolean;
+  last: boolean;
+  even: boolean;
+  odd: boolean;
+  count: number;
+}
+
 @Directive({
   // tslint:disable-next-line:directive-selector
   selector: '[virtualRepeatReactive]'
 })
 // tslint:disable-next-line:directive-class-suffix
 export class VirtualRepeatReactive<T> extends VirtualRepeatBase<T> implements OnChanges, OnInit, OnDestroy {
+  static ngTemplateContextGuard<T>(
+    dir: VirtualRepeatReactive<T>,
+    ctx: unknown
+  ): ctx is ForDirectiveContext<T> {
+    return true;
+  }
+
   @Input()
   set virtualRepeatReactiveForTrackBy(fn: TrackByFunction<T>) {
     if (isDevMode() && fn != null && typeof fn !== 'function') {
@@ -70,6 +87,8 @@ export class VirtualRepeatReactive<T> extends VirtualRepeatBase<T> implements On
     }
   }
 
+  @Input() virtualRepeatReactiveOf: NgIterable<T>;
+
   constructor(
     virtualRepeatContainer: VirtualRepeatContainer,
     differs: IterableDiffers,
@@ -81,8 +100,6 @@ export class VirtualRepeatReactive<T> extends VirtualRepeatBase<T> implements On
   }
 
   protected _collection: IReactiveCollection<T>;
-
-  @Input() virtualRepeatReactiveOf: NgIterable<T>;
 
   private _viewDeferreds: { [index: number]: Deferred<ViewRef> } = [];
 

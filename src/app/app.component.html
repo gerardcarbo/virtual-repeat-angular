@@ -122,8 +122,8 @@
         <label *ngIf="config.showReactive" style="float: right">
           <input type="checkbox" name="showReactiveImages" [(ngModel)]="config.showReactiveImages" (change)="onChange()">Images</label>
         <label style="float: right" *ngIf="config.showReactive">
-          <input type="checkbox" [formControl]="tableViewReactive" [(ngModel)]="config.tableViewReactive" (change)="onChange()">Table View (variable height)</label>
-          Current Item: <input type="number" readonly style="max-width: 50px" [ngModel]="reactivePosition">
+          <input type="checkbox" [(ngModel)]="config.tableViewReactive" (change)="onReactiveTableViewChange($event)">Table View (variable height)</label>
+          Current Item: <input type="number" readonly disabled style="max-width: 50px" [ngModel]="reactivePosition">
           Go to Item: <input type="number" style="max-width: 50px" [(ngModel)]="reactivePositionGoto" (change)="gotoReactivePosition()">
           &nbsp;<input type="button" (click)="resetReactive()" value="reset">
 

@@ -23,7 +23,7 @@ export class ReactiveCollectionFactory<T> implements IReactiveCollectionFactory<
 @Injectable({
   providedIn: 'root'
 })
-export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
+export class ReactiveCollectionService<T> implements IReactiveCollection<T>, Iterable<T>, Iterator<T>  {
   private _itemsPerPage = 10;
   private _collection = [];
   private _subscription: Subscription;
@@ -42,6 +42,16 @@ export class ReactiveCollectionService<T> implements IReactiveCollection<T> {
   _connected = false;
 
   constructor(private remoteService: RemoteService, private logger: LoggerService) {
+  }
+
+  //disable error TS2322: Type 'ReactiveCollectionService<any>' is not assignable to type 'NgIterable<any>'
+  [Symbol.iterator](): Iterator<T>
+  {
+    return <Iterator<T>>this;
+  }
+  next(...args: [] | [T]): IteratorResult<T, T>
+  {
+    return null;
   }
 
   connect() {

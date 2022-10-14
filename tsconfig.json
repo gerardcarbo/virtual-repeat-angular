@@ -28,5 +28,8 @@
         "projects/virtual-repeat-angular-lib/src/lib/*" //used to debug the library with .ts code
       ]
     }
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true,
   }
 }

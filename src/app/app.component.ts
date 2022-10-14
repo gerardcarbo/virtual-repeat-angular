@@ -36,8 +36,6 @@ export class AppComponent implements OnInit {
 
   currentReactiveVirtualRepeatContainer: VirtualRepeatContainer;
 
-  tableViewReactive = new FormControl('');
-
   collection: { id: number; image: string; content: string }[] = [];
 
   public processing = false;
@@ -59,26 +57,7 @@ export class AppComponent implements OnInit {
       this.collection = MOCK_DATA;
     }, 100);
 
-    // capture processing$ notifications to display loading progress (only in reactive for demo purposes)
-    this.tableViewReactive.valueChanges.subscribe((viewTable: boolean) => {
-      if (viewTable) {
-        this.reactiveCollection.reset();
-        setTimeout(() => {
-          if (this.reactiveVirtualRepeatContainerTable) {
-            this.currentReactiveVirtualRepeatContainer = this.reactiveVirtualRepeatContainerTable;
-            this.subscribeToReactiveData();
-          }
-        }, 100);
-      } else {
-        this.reactiveCollection.reset();
-        setTimeout(() => {
-          if (this.reactiveVirtualRepeatContainerList) {
-            this.currentReactiveVirtualRepeatContainer = this.reactiveVirtualRepeatContainerList;
-            this.subscribeToReactiveData();
-          }
-        }, 100);
-      }
-    });
+    this.changeContainerStyle(this.config.tableViewReactive);
   }
 
   private subscribeToReactiveData() {
@@ -92,6 +71,35 @@ export class AppComponent implements OnInit {
 
   onChange() {
     localStorage.setItem('AppComponentConfig', JSON.stringify(this.config));
+  }
+
+  changeContainerStyle(useTable)
+  {
+    // change active container and capture processing$ notifications in subscribeToReactiveData
+    // to display loading progress (only in reactive for demo purposes)
+    if (useTable) {
+      this.reactiveCollection.reset();
+      setTimeout(() => {
+        if (this.reactiveVirtualRepeatContainerTable) {
+          this.currentReactiveVirtualRepeatContainer = this.reactiveVirtualRepeatContainerTable;
+          this.subscribeToReactiveData();
+        }
+      }, 100);
+    } else {
+      this.reactiveCollection.reset();
+      setTimeout(() => {
+        if (this.reactiveVirtualRepeatContainerList) {
+          this.currentReactiveVirtualRepeatContainer = this.reactiveVirtualRepeatContainerList;
+          this.subscribeToReactiveData();
+        }
+      }, 100);
+    }
+
+  }
+
+  onReactiveTableViewChange(e) {
+    this.changeContainerStyle(e.target.checked);
+    this.onChange();
   }
 
   resetReactive() {
