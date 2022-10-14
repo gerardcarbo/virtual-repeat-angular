@@ -7,7 +7,8 @@ import {
   ViewContainerRef,
   ViewRef,
   OnDestroy,
-  OnInit
+  OnInit,
+  Directive
 } from '@angular/core';
 
 import { Subscription, Observable, Subject, BehaviorSubject } from 'rxjs';
@@ -110,6 +111,8 @@ export interface IVirtualRepeat {
   reset(): void;
 }
 
+@Directive({
+})
 export abstract class VirtualRepeatBase<T>
   implements IVirtualRepeat, OnInit, OnDestroy {
   protected _differ: IterableDiffer<T>;

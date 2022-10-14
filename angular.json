@@ -141,6 +141,5 @@
         }
       }
     }
-  },
-  "defaultProject": "virtual-repeat-angular-lib-app"
+  }
 }
