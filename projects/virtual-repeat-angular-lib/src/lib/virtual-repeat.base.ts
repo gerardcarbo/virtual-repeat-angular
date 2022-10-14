@@ -162,7 +162,7 @@ export abstract class VirtualRepeatBase<T>
   protected _processTimeout = 5000;
   protected _doProcessTimeout: any;
 
-  public requestMeasure: Subject<any> = new Subject();
+  public requestMeasure: Subject<void> = new Subject();
   protected _requestMeasureFiltered: Observable<any> = this.requestMeasure.pipe(
     tap(() => {
       this.logger.log('requestMeasureFiltered: requested');
@@ -183,7 +183,7 @@ export abstract class VirtualRepeatBase<T>
     })
   );
 
-  public requestLayout: Subject<any> = new Subject();
+  public requestLayout: Subject<void> = new Subject();
   protected _requestLayoutFiltered: Observable<any> = this.requestLayout.pipe(
     tap(() => {
       this.logger.log('requestLayoutFiltered: requested');
